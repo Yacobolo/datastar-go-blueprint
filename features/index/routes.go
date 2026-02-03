@@ -1,26 +1,27 @@
 package index
 
 import (
-	database "github.com/yourusername/datastar-go-starter-kit/db"
+	dbstore "github.com/yourusername/datastar-go-starter-kit/db"
 	"github.com/yourusername/datastar-go-starter-kit/features/index/services"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/sessions"
+	"github.com/nats-io/nats.go"
 )
 
-func SetupRoutes(router chi.Router, store sessions.Store, queries *database.Queries) error {
-	todoService, err := services.NewTodoService(queries, store)
+func SetupRoutes(router chi.Router, sessStore sessions.Store, queries *dbstore.Queries, nc *nats.Conn) error {
+	todoService, err := services.NewTodoService(queries, sessStore)
 	if err != nil {
 		return err
 	}
 
-	handlers := NewHandlers(todoService)
+	handlers := NewHandlers(todoService, nc, sessStore)
 
 	router.Get("/", handlers.IndexPage)
 
 	router.Route("/api", func(apiRouter chi.Router) {
 		apiRouter.Route("/todos", func(todosRouter chi.Router) {
-			todosRouter.Get("/", handlers.TodosSSE)
+			todosRouter.Get("/updates", handlers.TodosUpdates) // Changed from "/" to "/updates"
 			todosRouter.Put("/reset", handlers.ResetTodos)
 			todosRouter.Put("/cancel", handlers.CancelEdit)
 			todosRouter.Put("/mode/{mode}", handlers.SetMode)

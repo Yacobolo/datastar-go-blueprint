@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	database "github.com/yourusername/datastar-go-starter-kit/db"
+	dbstore "github.com/yourusername/datastar-go-starter-kit/db"
 	"github.com/yourusername/datastar-go-starter-kit/features/index/components"
 
 	"github.com/google/uuid"
@@ -15,15 +15,20 @@ import (
 )
 
 type TodoService struct {
-	queries *database.Queries
+	queries *dbstore.Queries
 	store   sessions.Store
 }
 
-func NewTodoService(queries *database.Queries, store sessions.Store) (*TodoService, error) {
+func NewTodoService(queries *dbstore.Queries, store sessions.Store) (*TodoService, error) {
 	return &TodoService{
 		queries: queries,
 		store:   store,
 	}, nil
+}
+
+// Queries returns the sqlc queries instance for direct access
+func (s *TodoService) Queries() *dbstore.Queries {
+	return s.queries
 }
 
 func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *components.TodoMVC, error) {
@@ -139,7 +144,7 @@ func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *co
 		}
 
 		todoID := uuid.New().String()
-		if err := s.queries.CreateTodo(ctx, database.CreateTodoParams{
+		if err := s.queries.CreateTodo(ctx, dbstore.CreateTodoParams{
 			ID:        todoID,
 			UserID:    sessionID,
 			Task:      todo.Text,

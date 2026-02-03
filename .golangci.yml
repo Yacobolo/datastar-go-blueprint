@@ -1,0 +1,87 @@
+run:
+  timeout: 5m
+  go: '1.23'
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+  govet:
+    enable-all: true
+
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+
+  depguard:
+    rules:
+      Main:
+        deny:
+          - pkg: "github.com/sirupsen/logrus"
+            desc: "Use log/slog only."
+          - pkg: "^log$"
+            desc: "Use log/slog. For fatal errors, return them."
+
+  sloglint:
+    no-global: "all"
+    key-naming-case: snake
+    static-msg: true
+    no-mixed-args: true
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - unnamedResult
+
+linters:
+  enable:
+    # Critical
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+
+    # Error handling
+    - errname       # Enforces "Err" prefix
+    - errorlint     # Enforces %w wrapping
+    - nilerr        # Catches nil returns on errors
+
+    # Database & logging
+    - sqlclosecheck # Prevents connection leaks
+    - rowserrcheck  # Ensures rows.Err() checked
+    - sloglint      # Structured logging consistency
+    - depguard      # Deny list for imports
+
+    # Quality & security
+    - revive
+    - gosec
+    - gocritic
+    - noctx         # Prevents zombie requests
+
+    # Style
+    - gofmt
+    - goimports
+
+issues:
+  exclude-rules:
+    # Allow long lines in generated code
+    - path: "_templ\\.go$"
+      linters:
+        - lll
+    # Allow complexity in handlers
+    - path: "handlers\\.go$"
+      linters:
+        - gocyclo
+        - cyclop
+    # Ignore unused parameters in main
+    - path: "cmd/web/main\\.go$"
+      linters:
+        - unused
+
+  max-issues-per-linter: 0
+  max-same-issues: 0

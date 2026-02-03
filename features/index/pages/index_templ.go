@@ -59,15 +59,15 @@ func IndexPage(title string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("@get('/api/todos',{requestCancellation: 'disabled'})")
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("@get('/api/todos/updates',{requestCancellation: 'disabled'})")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/index/pages/index.templ`, Line: 12, Col: 95}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/index/pages/index.templ`, Line: 12, Col: 103}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"flex items-center justify-center p-8\"><p class=\"text-gray-500\">Loading todos...</p></div></div><div id=\"toast-container\" class=\"fixed bottom-4 right-4 space-y-2\"></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

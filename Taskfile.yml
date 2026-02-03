@@ -11,10 +11,12 @@ tasks:
     cmds:
       - sqlc generate
     sources:
-      - "db/schema.sql"
+      - "internal/store/migrations/*.sql"
       - "db/queries.sql"
     generates:
       - "db/*.go"
+    status:
+      - test -f db/db.go && test -f db/models.go
 
   generate:templ:
     desc: Generate Go code from templ templates
@@ -31,8 +33,9 @@ tasks:
       - generate:sqlc
       - generate:templ
 
-  # The `build:` tasks below are used together for production builds of a project
+  # Build tasks
   build:templ:
+    desc: Generate templ files for production
     cmds:
       - go tool templ generate
     sources:
@@ -41,20 +44,23 @@ tasks:
       - "**/*_templ.go"
 
   build:web:styles:
-    desc: Copy CSS files to static directory
+    desc: Bundle CSS (tokens + layers)
     cmds:
       - mkdir -p $STATIC_DIR
-      - cp -r tokens $STATIC_DIR/
-      - "echo 'Note: CSS build simplified - Tailwind removed'"
+      - cat tokens/index.css > $STATIC_DIR/styles.css
+      - "echo '/* Note: Tailwind removed, using basetoken design tokens */'"
     sources:
-      - "./tokens/**/*.css"
-      - "./web/resources/**/*.css"
+      - "tokens/**/*.css"
+      - "web/resources/**/*.css"
+    generates:
+      - "{{.STATIC_DIR}}/styles.css"
 
   build:web:bundle:
+    desc: Bundle Lit components with esbuild
     cmds:
       - go run cmd/web/build/main.go
     sources:
-      - "./web/libs/**/**/*.{html,css,ts}"
+      - "web/libs/**/*.{ts,css}"
     generates:
       - "{{.STATIC_DIR}}/libs/**"
 
@@ -67,8 +73,44 @@ tasks:
       - build:web:styles
       - build:web:bundle
 
+  # Database tasks
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - |
+        echo "Migrations are applied automatically on app startup"
+        echo "Database will be created at: $DB_PATH"
+
+  db:reset:
+    desc: "Reset database (WARNING: deletes all data)"
+    cmds:
+      - rm -f $DB_PATH $DB_PATH-shm $DB_PATH-wal
+      - echo "Database deleted. Migrations will run on next app start."
+
+  # Development tasks
+  dev:
+    desc: Run development server with hot reload
+    deps:
+      - generate
+    cmds:
+      - task: dev:kill  # Clean up any stale processes
+      - task: dev:server
+
+  dev:kill:
+    desc: Kill stale dev processes
+    cmds:
+      - pkill -9 -f "templ generate" 2>/dev/null || true
+      - lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+      - pkill -9 -f "air" 2>/dev/null || true
+
+  dev:server:
+    desc: Start Air for hot reload
+    cmds:
+      - go tool air -build.cmd "go build -tags=dev -o tmp/bin/main ./cmd/web" -build.bin "tmp/bin/main" -build.exclude_dir "data,node_modules" -build.include_ext "go,templ" -misc.clean_on_exit "true"
+
   # Use this task to debug with the delve debugger
   debug:
+    desc: Run with delve debugger
     cmds:
       - go tool dlv exec ./bin/main
     deps:
@@ -76,46 +118,88 @@ tasks:
 
   # Use this task to download latest version of client libs
   download:
+    desc: Download latest Datastar client libraries
     cmds:
       - go run cmd/downloader/main.go
 
   # The `live:` tasks below are used together for development builds and will live-reload the server
   live:templ:
+    desc: Watch and regenerate templ files
     cmds:
       - go tool templ generate -watch
 
   live:web:styles:
-    desc: Watch and copy CSS files (Tailwind removed)
+    desc: Watch CSS files (static tokens, no build needed)
     cmds:
-      - "echo 'CSS watching disabled - using static tokens'"
+      - "echo 'CSS watching disabled - using static basetoken tokens'"
 
   live:web:bundle:
+    desc: Watch and rebuild Lit components
     cmds:
       - go run cmd/web/build/main.go -watch
 
   live:server:
+    desc: Run Air for hot reload (use 'dev' task instead)
     cmds:
-      - |
-        go tool air  \
-         -build.cmd "go build -tags=dev -o tmp/bin/main ./cmd/web" \
-         -build.bin "tmp/bin/main" \
-         -build.exclude_dir "data,node_modules,web/resources/libs/datastar/node_modules,web/resources/libs/lit/node_modules" \
-         -build.include_ext "go,templ" \
-         -misc.clean_on_exit "true"
+      - task: dev:server
 
   live:
+    desc: Run all live reload tasks (use 'dev' task instead)
     deps:
       - live:templ
       - live:web:styles
       - live:web:bundle
       - live:server
 
+  # Testing and linting
+  test:
+    desc: Run all tests
+    cmds:
+      - go test -v ./...
+
+  test:coverage:
+    desc: Run tests with coverage report
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - echo "Coverage report generated at coverage.html"
+
+  lint:
+    desc: Run Go linters
+    cmds:
+      - golangci-lint run ./...
+
+  check:
+    desc: Run tests and all linters
+    cmds:
+      - task: test
+      - task: lint
+
+  # Cleanup tasks
+  clean:
+    desc: Remove generated files and build artifacts
+    cmds:
+      - rm -rf bin/ tmp/ $STATIC_DIR
+      - find . -name "*_templ.go" -delete
+      - find . -name "*.gen.go" -delete
+      - rm -f coverage.out coverage.html
+      - echo "Cleaned generated files and build artifacts"
+
+  clean:all:
+    desc: Clean everything including database
+    cmds:
+      - task: clean
+      - task: db:reset
+
+  # Run the built binary
   run:
+    desc: Run the production binary
     cmds:
       - ./bin/main
     deps:
       - build
 
+  # Default task
   default:
     cmds:
-      - task: live
+      - task: dev

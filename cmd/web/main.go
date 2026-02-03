@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/yourusername/datastar-go-starter-kit/config"
-	database "github.com/yourusername/datastar-go-starter-kit/db"
-	"github.com/yourusername/datastar-go-starter-kit/router"
 	"log/slog"
 	"net"
 	"net/http"
@@ -14,9 +11,15 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/yourusername/datastar-go-starter-kit/config"
+	"github.com/yourusername/datastar-go-starter-kit/internal/store"
+	"github.com/yourusername/datastar-go-starter-kit/router"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/sessions"
+	embeddednats "github.com/nats-io/nats-server/v2/server"
+	"github.com/nats-io/nats.go"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -57,14 +60,42 @@ func run(ctx context.Context) error {
 	sessionStore.Options.Secure = false
 	sessionStore.Options.SameSite = http.SameSiteLaxMode
 
-	// Initialize database
-	dbConn, queries, err := database.InitDB(config.Global.DBPath)
-	if err != nil {
-		return fmt.Errorf("failed to initialize database: %w", err)
+	// Start embedded NATS server
+	natsOpts := &embeddednats.Options{
+		Host:      "localhost",
+		Port:      4222,
+		JetStream: true,
 	}
-	defer dbConn.Close()
+	ns, err := embeddednats.NewServer(natsOpts)
+	if err != nil {
+		return fmt.Errorf("failed to start NATS: %w", err)
+	}
+	go ns.Start()
+	if !ns.ReadyForConnections(4 * time.Second) {
+		return fmt.Errorf("NATS not ready")
+	}
+	defer ns.Shutdown()
 
-	if err := router.SetupRoutes(egctx, r, sessionStore, queries); err != nil {
+	slog.Info("NATS server started", "url", ns.ClientURL())
+
+	// Connect to NATS
+	nc, err := nats.Connect(ns.ClientURL())
+	if err != nil {
+		return fmt.Errorf("failed to connect to NATS: %w", err)
+	}
+	defer nc.Close()
+
+	// Initialize database with new store package
+	dbStore, err := store.Open(config.Global.DBPath)
+	if err != nil {
+		return fmt.Errorf("failed to open database: %w", err)
+	}
+	defer dbStore.Close()
+
+	slog.Info("database initialized", "path", config.Global.DBPath)
+
+	// Setup routes with NATS connection
+	if err := router.SetupRoutes(egctx, r, sessionStore, dbStore.Queries(), nc); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}
 

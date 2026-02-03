@@ -7,16 +7,17 @@ import (
 	"sync"
 
 	"github.com/yourusername/datastar-go-starter-kit/config"
-	database "github.com/yourusername/datastar-go-starter-kit/db"
+	dbstore "github.com/yourusername/datastar-go-starter-kit/db"
 	indexFeature "github.com/yourusername/datastar-go-starter-kit/features/index"
 	"github.com/yourusername/datastar-go-starter-kit/web/resources"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/sessions"
+	"github.com/nats-io/nats.go"
 	"github.com/starfederation/datastar-go/datastar"
 )
 
-func SetupRoutes(ctx context.Context, router chi.Router, sessionStore *sessions.CookieStore, queries *database.Queries) (err error) {
+func SetupRoutes(ctx context.Context, router chi.Router, sessionStore *sessions.CookieStore, queries *dbstore.Queries, nc *nats.Conn) (err error) {
 
 	if config.Global.Environment == config.Dev {
 		setupReload(router)
@@ -24,7 +25,7 @@ func SetupRoutes(ctx context.Context, router chi.Router, sessionStore *sessions.
 
 	router.Handle("/static/*", resources.Handler())
 
-	if err := indexFeature.SetupRoutes(router, sessionStore, queries); err != nil {
+	if err := indexFeature.SetupRoutes(router, sessionStore, queries, nc); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}
 
