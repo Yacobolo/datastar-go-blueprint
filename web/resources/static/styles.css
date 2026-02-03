@@ -27,3 +27,15 @@
 
 /* === Tier 3: App-Specific === */
 @import "./app.css";
+/* Import design tokens */
+@import url('../../../tokens/index.css');
+
+/* Define layer order */
+@layer base, components, utilities;
+
+/* Import layers */
+@import './layers/base.css';
+@import './layers/components/button.css';
+@import './layers/components/input.css';
+@import './layers/components/todo.css';
+@import './layers/utilities.css';

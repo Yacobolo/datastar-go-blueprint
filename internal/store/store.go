@@ -11,7 +11,7 @@ import (
 
 	_ "modernc.org/sqlite" // SQLite driver registration
 
-	dbstore "github.com/yourusername/datastar-go-starter-kit/db"
+	"github.com/yourusername/datastar-go-starter-kit/internal/store/queries"
 )
 
 // txKey is the context key for storing transaction state.
@@ -20,7 +20,7 @@ type txKey struct{}
 // SQLiteStore wraps the database connection and queries.
 type SQLiteStore struct {
 	db      *sql.DB
-	queries *dbstore.Queries
+	queries *queries.Queries
 }
 
 // Open creates a new SQLiteStore with the given DSN.
@@ -59,7 +59,7 @@ func Open(dsn string) (*SQLiteStore, error) {
 
 	return &SQLiteStore{
 		db:      db,
-		queries: dbstore.New(db),
+		queries: queries.New(db),
 	}, nil
 }
 
@@ -72,7 +72,7 @@ func (s *SQLiteStore) Close() error {
 }
 
 // Queries returns the sqlc-generated queries.
-func (s *SQLiteStore) Queries() *dbstore.Queries {
+func (s *SQLiteStore) Queries() *queries.Queries {
 	return s.queries
 }
 
@@ -107,10 +107,10 @@ func (s *SQLiteStore) WithinTransaction(ctx context.Context, fn func(txCtx conte
 	return nil
 }
 
-// conn returns the appropriate dbstore.Queries instance for the given context.
+// conn returns the appropriate queries.Queries instance for the given context.
 // If the context contains a transaction, it returns queries bound to that transaction.
 // Otherwise, it returns queries bound to the main database connection.
-func (s *SQLiteStore) conn(ctx context.Context) *dbstore.Queries {
+func (s *SQLiteStore) conn(ctx context.Context) *queries.Queries {
 	if tx, ok := ctx.Value(txKey{}).(*sql.Tx); ok {
 		return s.queries.WithTx(tx)
 	}

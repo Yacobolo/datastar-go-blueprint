@@ -1,0 +1,68 @@
+@layer utilities {
+  /* Layout */
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .items-center { align-items: center; }
+  .items-start { align-items: flex-start; }
+  .justify-center { justify-content: center; }
+  .justify-between { justify-content: space-between; }
+  .justify-end { justify-content: flex-end; }
+  
+  /* Spacing - gap */
+  .gap-xs { gap: var(--ui-space-xs); }
+  .gap-sm { gap: var(--ui-space-sm); }
+  .gap-md { gap: var(--ui-space-md); }
+  .gap-lg { gap: var(--ui-space-lg); }
+  .gap-xl { gap: var(--ui-space-xl); }
+  
+  /* Spacing - padding */
+  .p-sm { padding: var(--ui-space-sm); }
+  .p-md { padding: var(--ui-space-md); }
+  .p-lg { padding: var(--ui-space-lg); }
+  .px-md { padding-left: var(--ui-space-md); padding-right: var(--ui-space-md); }
+  .py-md { padding-top: var(--ui-space-md); padding-bottom: var(--ui-space-md); }
+  
+  /* Spacing - margin */
+  .m-auto { margin: auto; }
+  .mt-md { margin-top: var(--ui-space-md); }
+  .mb-md { margin-bottom: var(--ui-space-md); }
+  .mb-lg { margin-bottom: var(--ui-space-lg); }
+  
+  /* Typography */
+  .text-xs { font-size: var(--ui-type-size-xs); }
+  .text-sm { font-size: var(--ui-type-size-sm); }
+  .text-base { font-size: var(--ui-type-size-base); }
+  .text-lg { font-size: var(--ui-type-size-lg); }
+  .text-xl { font-size: var(--ui-type-size-xl); }
+  .text-2xl { font-size: var(--ui-type-size-2xl); }
+  .text-3xl { font-size: var(--ui-type-size-3xl); }
+  .text-4xl { font-size: var(--ui-type-size-4xl); }
+  
+  .font-normal { font-weight: var(--ui-weight-normal); }
+  .font-medium { font-weight: var(--ui-weight-medium); }
+  .font-bold { font-weight: var(--ui-weight-bold); }
+  
+  .text-center { text-align: center; }
+  .text-left { text-align: left; }
+  .text-right { text-align: right; }
+  
+  /* Colors */
+  .text-primary { color: var(--ui-color-primary); }
+  .text-error { color: var(--ui-color-error); }
+  .text-muted { color: var(--ui-color-on-surface-variant); }
+  
+  /* Sizing */
+  .w-full { width: 100%; }
+  .h-full { height: 100%; }
+  .min-h-screen { min-height: 100vh; }
+  
+  /* Borders */
+  .rounded-sm { border-radius: var(--ui-radius-sm); }
+  .rounded-md { border-radius: var(--ui-radius-md); }
+  .rounded-lg { border-radius: var(--ui-radius-lg); }
+  
+  /* Display */
+  .hidden { display: none; }
+  .invisible { visibility: hidden; }
+  .visible { visibility: visible; }
+}

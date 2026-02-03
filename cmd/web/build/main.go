@@ -5,10 +5,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/yourusername/datastar-go-starter-kit/internal/config"
+	"github.com/yourusername/datastar-go-starter-kit/web/resources"
 	"log/slog"
 	"net/http"
-	"github.com/yourusername/datastar-go-starter-kit/config"
-	"github.com/yourusername/datastar-go-starter-kit/web/resources"
 	"os"
 	"os/signal"
 	"syscall"
@@ -51,14 +51,10 @@ func build(ctx context.Context) error {
 				InputPath:  resources.LibsDirectoryPath + "/web-components/reverse-component/index.ts",
 				OutputPath: "libs/reverse-component",
 			},
-			/*
-				uncomment the entrypoint below after running pnpm install in the resources.LibsDirectoryPath + /lit directory
-				esbuild will only be able to find the lit + sortable libraries after doing so
-			*/
-			// {
-			// 	InputPath:  resources.LibsDirectoryPath + "/lit/src/index.ts",
-			// 	OutputPath: "libs/sortable-example",
-			// },
+			{
+				InputPath:  resources.LibsDirectoryPath + "/lit/src/index.ts",
+				OutputPath: "libs/index",
+			},
 		},
 		Bundle:            true,
 		Format:            api.FormatESModule,

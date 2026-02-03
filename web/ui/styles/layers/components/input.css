@@ -1,0 +1,28 @@
+@layer components {
+  .input {
+    display: block;
+    width: 100%;
+    padding: var(--ui-space-sm) var(--ui-space-md);
+    font-size: var(--ui-type-size-base);
+    line-height: var(--ui-leading-normal);
+    color: var(--ui-color-on-surface);
+    background: var(--ui-color-surface);
+    border: var(--ui-border-md) solid var(--ui-color-outline);
+    border-radius: var(--ui-radius-md);
+    transition: border-color var(--ui-duration-fast) var(--ui-ease-default);
+
+    &:focus {
+      outline: none;
+      border-color: var(--ui-color-primary);
+    }
+
+    &::placeholder {
+      color: var(--ui-color-on-surface-variant);
+      opacity: 0.6;
+    }
+  }
+
+  .input-bordered {
+    border-width: var(--ui-border-lg);
+  }
+}

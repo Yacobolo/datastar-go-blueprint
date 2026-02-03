@@ -1,0 +1,103 @@
+@layer components {
+  .todo-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--ui-space-lg);
+  }
+
+  .todo-header {
+    margin-bottom: var(--ui-space-lg);
+    text-align: center;
+  }
+
+  .todo-input-group {
+    display: flex;
+    gap: var(--ui-space-md);
+    margin-bottom: var(--ui-space-lg);
+  }
+
+  .todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-sm);
+  }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-md);
+    padding: var(--ui-space-md);
+    background: var(--ui-color-surface);
+    border: var(--ui-border-md) solid var(--ui-color-outline);
+    border-radius: var(--ui-radius-md);
+    transition: background var(--ui-duration-fast) var(--ui-ease-default);
+
+    &:hover {
+      background: var(--ui-color-surface-variant);
+    }
+  }
+
+  .todo-item-completed {
+    opacity: 0.6;
+  }
+
+  .todo-task {
+    flex: 1;
+  }
+
+  .todo-task-text {
+    font-size: var(--ui-type-size-base);
+    color: var(--ui-color-on-surface);
+  }
+
+  .todo-task-completed {
+    text-decoration: line-through;
+  }
+
+  .todo-actions {
+    display: flex;
+    gap: var(--ui-space-sm);
+  }
+
+  .todo-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: var(--ui-space-lg);
+    right: var(--ui-space-lg);
+    padding: var(--ui-space-md) var(--ui-space-lg);
+    border-radius: var(--ui-radius-md);
+    box-shadow: var(--ui-shadow-lg);
+    animation: slideIn 0.3s var(--ui-ease-default);
+  }
+
+  .toast-success {
+    background: var(--ui-color-primary);
+    color: var(--ui-color-on-primary);
+  }
+
+  .toast-error {
+    background: var(--ui-color-error);
+    color: var(--ui-color-on-error);
+  }
+
+  .toast-info {
+    background: var(--ui-color-secondary);
+    color: var(--ui-color-on-secondary);
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}

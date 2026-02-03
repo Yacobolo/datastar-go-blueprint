@@ -1,205 +1,159 @@
-version: "3"
-
-env:
-  STATIC_DIR: "web/resources/static"
-  DB_PATH: "./data/todos.db"
+version: '3'
 
 tasks:
-  # Code generation tasks
-  generate:sqlc:
-    desc: Generate type-safe database code from SQL
+  # ====================
+  # Development Commands
+  # ====================
+  
+  default:
+    desc: Show available tasks
     cmds:
-      - sqlc generate
-    sources:
-      - "internal/store/migrations/*.sql"
-      - "db/queries.sql"
-    generates:
-      - "db/*.go"
-    status:
-      - test -f db/db.go && test -f db/models.go
+      - task --list
 
-  generate:templ:
-    desc: Generate Go code from templ templates
+  dev:
+    desc: Start development server with live reload
+    aliases: [live, watch]
+    deps:
+      - generate:all
     cmds:
-      - go tool templ generate
-    sources:
-      - "**/*.templ"
-    generates:
-      - "**/*_templ.go"
+      - air
 
-  generate:
-    desc: Run all code generation
+  # ====================
+  # Code Generation
+  # ====================
+
+  generate:all:
+    desc: Run all code generators
     deps:
       - generate:sqlc
       - generate:templ
 
-  # Build tasks
-  build:templ:
-    desc: Generate templ files for production
-    cmds:
-      - go tool templ generate
+  generate:sqlc:
+    desc: Generate type-safe database code from SQL
     sources:
-      - "**/*.templ"
+      - internal/store/queries/*.sql
+      - internal/store/migrations/*.sql
     generates:
-      - "**/*_templ.go"
-
-  build:web:styles:
-    desc: Bundle CSS (tokens + layers)
+      - internal/store/queries/*.go
     cmds:
-      - mkdir -p $STATIC_DIR
-      - cat tokens/index.css > $STATIC_DIR/styles.css
-      - "echo '/* Note: Tailwind removed, using basetoken design tokens */'"
-    sources:
-      - "tokens/**/*.css"
-      - "web/resources/**/*.css"
-    generates:
-      - "{{.STATIC_DIR}}/styles.css"
+      - sqlc generate
 
-  build:web:bundle:
-    desc: Bundle Lit components with esbuild
+  generate:templ:
+    desc: Generate Go code from templ templates
+    aliases: [build:templ]
+    sources:
+      - web/ui/templates/**/*.templ
+    generates:
+      - web/ui/templates/**/*_templ.go
     cmds:
-      - go run cmd/web/build/main.go
-    sources:
-      - "web/libs/**/*.{ts,css}"
-    generates:
-      - "{{.STATIC_DIR}}/libs/**"
+      - templ generate
 
-  build:
+  # ====================
+  # Build Commands
+  # ====================
+
+  build:all:
     desc: Build production binary
-    cmds:
-      - go build -tags=prod -o bin/main ./cmd/web
     deps:
-      - generate
+      - generate:all
+      - build:web:all
+    cmds:
+      - go build -o bin/server cmd/web/main.go
+
+  build:web:all:
+    desc: Build all web assets
+    deps:
       - build:web:styles
       - build:web:bundle
 
-  # Database tasks
-  db:migrate:
-    desc: Run database migrations
+  build:web:styles:
+    desc: Bundle CSS with design tokens
+    sources:
+      - tokens/**/*.css
+      - web/ui/styles/**/*.css
+    generates:
+      - web/resources/static/styles.css
     cmds:
+      - mkdir -p web/resources/static
       - |
-        echo "Migrations are applied automatically on app startup"
-        echo "Database will be created at: $DB_PATH"
+        cat \
+          tokens/index.css \
+          web/ui/styles/main.css \
+          > web/resources/static/styles.css
+
+  build:web:bundle:
+    desc: Bundle JavaScript/TypeScript with esbuild
+    sources:
+      - web/libs/**/*.ts
+      - web/ui/components/**/*.ts
+    generates:
+      - web/resources/static/libs/*.js
+    cmds:
+      - go run cmd/web/build/main.go
+
+  # ====================
+  # Database Commands
+  # ====================
 
   db:reset:
-    desc: "Reset database (WARNING: deletes all data)"
+    desc: Reset database (DESTRUCTIVE)
+    prompt: This will delete all data. Continue?
     cmds:
-      - rm -f $DB_PATH $DB_PATH-shm $DB_PATH-wal
-      - echo "Database deleted. Migrations will run on next app start."
+      - rm -f data/*.db data/*.db-*
+      - echo "Database reset complete"
 
-  # Development tasks
-  dev:
-    desc: Run development server with hot reload
-    deps:
-      - generate
-    cmds:
-      - task: dev:kill  # Clean up any stale processes
-      - task: dev:server
+  # ====================
+  # Testing & Linting
+  # ====================
 
-  dev:kill:
-    desc: Kill stale dev processes
-    cmds:
-      - pkill -9 -f "templ generate" 2>/dev/null || true
-      - lsof -ti:8080 | xargs kill -9 2>/dev/null || true
-      - pkill -9 -f "air" 2>/dev/null || true
-
-  dev:server:
-    desc: Start Air for hot reload
-    cmds:
-      - go tool air -build.cmd "go build -tags=dev -o tmp/bin/main ./cmd/web" -build.bin "tmp/bin/main" -build.exclude_dir "data,node_modules" -build.include_ext "go,templ" -misc.clean_on_exit "true"
-
-  # Use this task to debug with the delve debugger
-  debug:
-    desc: Run with delve debugger
-    cmds:
-      - go tool dlv exec ./bin/main
-    deps:
-      - build
-
-  # Use this task to download latest version of client libs
-  download:
-    desc: Download latest Datastar client libraries
-    cmds:
-      - go run cmd/downloader/main.go
-
-  # The `live:` tasks below are used together for development builds and will live-reload the server
-  live:templ:
-    desc: Watch and regenerate templ files
-    cmds:
-      - go tool templ generate -watch
-
-  live:web:styles:
-    desc: Watch CSS files (static tokens, no build needed)
-    cmds:
-      - "echo 'CSS watching disabled - using static basetoken tokens'"
-
-  live:web:bundle:
-    desc: Watch and rebuild Lit components
-    cmds:
-      - go run cmd/web/build/main.go -watch
-
-  live:server:
-    desc: Run Air for hot reload (use 'dev' task instead)
-    cmds:
-      - task: dev:server
-
-  live:
-    desc: Run all live reload tasks (use 'dev' task instead)
-    deps:
-      - live:templ
-      - live:web:styles
-      - live:web:bundle
-      - live:server
-
-  # Testing and linting
   test:
     desc: Run all tests
     cmds:
       - go test -v ./...
 
   test:coverage:
-    desc: Run tests with coverage report
+    desc: Run tests with coverage
     cmds:
-      - go test -v -coverprofile=coverage.out ./...
+      - go test -coverprofile=coverage.out ./...
       - go tool cover -html=coverage.out -o coverage.html
-      - echo "Coverage report generated at coverage.html"
 
   lint:
     desc: Run Go linters
     cmds:
-      - golangci-lint run ./...
+      - golangci-lint run
 
-  check:
-    desc: Run tests and all linters
-    cmds:
-      - task: test
-      - task: lint
+  # ====================
+  # Cleanup
+  # ====================
 
-  # Cleanup tasks
   clean:
-    desc: Remove generated files and build artifacts
+    desc: Clean generated files and build artifacts
     cmds:
-      - rm -rf bin/ tmp/ $STATIC_DIR
-      - find . -name "*_templ.go" -delete
-      - find . -name "*.gen.go" -delete
-      - rm -f coverage.out coverage.html
-      - echo "Cleaned generated files and build artifacts"
+      - rm -rf bin/
+      - rm -rf tmp/
+      - rm -rf web/resources/static/
+      - find . -name '*_templ.go' -delete
 
-  clean:all:
-    desc: Clean everything including database
-    cmds:
-      - task: clean
-      - task: db:reset
+  # ====================
+  # Tools Installation
+  # ====================
 
-  # Run the built binary
-  run:
-    desc: Run the production binary
+  tools:install:
+    desc: Install development tools
     cmds:
-      - ./bin/main
-    deps:
-      - build
+      - go install github.com/a-h/templ/cmd/templ@latest
+      - go install github.com/air-verse/air@latest
+      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-  # Default task
-  default:
+  tools:check:
+    desc: Check if required tools are installed
     cmds:
-      - task: dev
+      - |
+        for tool in templ air sqlc golangci-lint; do
+          if command -v $tool &> /dev/null; then
+            echo "✓ $tool installed"
+          else
+            echo "✗ $tool missing - run 'task tools:install'"
+          fi
+        done

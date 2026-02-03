@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/nats-io/nats.go"
-	"github.com/yourusername/datastar-go-starter-kit/features/common/components"
+	"github.com/yourusername/datastar-go-starter-kit/web/ui/templates/components"
 )
 
 // UpdateMessage is the payload sent over NATS for UI updates
