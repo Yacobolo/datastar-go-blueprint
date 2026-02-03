@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/nats-io/nats.go"
-	"github.com/yourusername/datastar-go-starter-kit/web/ui/templates/components"
+	commoncomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
 )
 
 // UpdateMessage is the payload sent over NATS for UI updates
@@ -14,8 +14,8 @@ type UpdateMessage struct {
 }
 
 type ToastData struct {
-	Message string               `json:"message"`
-	Type    components.ToastType `json:"type"`
+	Message string                     `json:"message"`
+	Type    commoncomponents.ToastType `json:"type"`
 }
 
 // NotifyOption is a functional option for building UpdateMessage
@@ -29,7 +29,7 @@ func WithRefresh() NotifyOption {
 }
 
 // WithToast adds a toast notification
-func WithToast(msg string, toastType components.ToastType) NotifyOption {
+func WithToast(msg string, toastType commoncomponents.ToastType) NotifyOption {
 	return func(m *UpdateMessage) {
 		m.Toast = &ToastData{
 			Message: msg,

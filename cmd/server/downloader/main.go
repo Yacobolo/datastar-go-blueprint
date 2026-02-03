@@ -6,10 +6,11 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"github.com/yourusername/datastar-go-starter-kit/web/resources"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
 )
 
 func main() {

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/yourusername/datastar-go-starter-kit/internal/app/handlers"
-	"github.com/yourusername/datastar-go-starter-kit/internal/app/services"
-	"github.com/yourusername/datastar-go-starter-kit/internal/config"
-	"github.com/yourusername/datastar-go-starter-kit/internal/store/queries"
-	"github.com/yourusername/datastar-go-starter-kit/web/resources"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
+	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/sessions"
@@ -25,25 +25,16 @@ func SetupRoutes(ctx context.Context, router chi.Router, sessionStore *sessions.
 
 	router.Handle("/static/*", resources.Handler())
 
-	// Create TODO service and handlers
+	// Create TODO service
 	todoService, err := services.NewTodoService(q, sessionStore)
 	if err != nil {
 		return err
 	}
-	todoHandlers := handlers.NewHandlers(todoService, nc, sessionStore)
 
-	// Setup index/TODO routes
-	router.Get("/", todoHandlers.IndexPage)
-	router.Route("/api/todos", func(r chi.Router) {
-		r.Get("/updates", todoHandlers.TodosUpdates)
-		r.Put("/reset", todoHandlers.ResetTodos)
-		r.Put("/cancel", todoHandlers.CancelEdit)
-		r.Put("/mode/{mode}", todoHandlers.SetMode)
-		r.Post("/{idx}/toggle", todoHandlers.ToggleTodo)
-		r.Post("/{idx}/start-edit", todoHandlers.StartEdit)
-		r.Post("/{idx}/save-edit", todoHandlers.SaveEdit)
-		r.Delete("/{idx}", todoHandlers.DeleteTodo)
-	})
+	// Setup feature routes
+	if err := todo.SetupRoutes(router, sessionStore, nc, todoService); err != nil {
+		return err
+	}
 
 	return nil
 }

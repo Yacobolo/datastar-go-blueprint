@@ -5,13 +5,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/yourusername/datastar-go-starter-kit/internal/config"
-	"github.com/yourusername/datastar-go-starter-kit/web/resources"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
+	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
 
 	"github.com/evanw/esbuild/pkg/api"
 	"golang.org/x/sync/errgroup"
@@ -48,11 +49,7 @@ func build(ctx context.Context) error {
 	opts := api.BuildOptions{
 		EntryPointsAdvanced: []api.EntryPoint{
 			{
-				InputPath:  resources.LibsDirectoryPath + "/web-components/reverse-component/index.ts",
-				OutputPath: "libs/reverse-component",
-			},
-			{
-				InputPath:  resources.LibsDirectoryPath + "/lit/src/index.ts",
+				InputPath:  resources.LibsDirectoryPath + "/src/index.ts",
 				OutputPath: "libs/index",
 			},
 		},

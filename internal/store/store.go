@@ -11,7 +11,7 @@ import (
 
 	_ "modernc.org/sqlite" // SQLite driver registration
 
-	"github.com/yourusername/datastar-go-starter-kit/internal/store/queries"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
 )
 
 // txKey is the context key for storing transaction state.

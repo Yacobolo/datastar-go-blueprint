@@ -5,6 +5,7 @@ A modern, opinionated starter kit for building reactive web applications with Go
 ## Stack
 
 **Backend:**
+
 - [Go](https://go.dev/doc/) - Type-safe backend with excellent tooling
 - [SQLite](https://www.sqlite.org/) + [sqlc](https://sqlc.dev/) - Embedded database with type-safe queries
 - [Datastar](https://github.com/starfederation/datastar) - Hypermedia-driven reactivity
@@ -12,6 +13,7 @@ A modern, opinionated starter kit for building reactive web applications with Go
 - [Chi](https://github.com/go-chi/chi) - Lightweight, composable HTTP router
 
 **Frontend:**
+
 - [Lit](https://lit.dev/) - Fast, modern web components
 - Native CSS with CSS layers, nesting, and custom properties
 - [esbuild](https://esbuild.github.io/) - Lightning-fast JavaScript bundling
@@ -32,7 +34,7 @@ A modern, opinionated starter kit for building reactive web applications with Go
 1. Clone this repository
 
 ```shell
-git clone https://github.com/yourusername/datastar-go-starter-kit.git
+git clone https://github.com/yacobolo/datastar-go-starter-kit.git
 cd datastar-go-starter-kit
 ```
 
@@ -63,6 +65,7 @@ go tool task live
 ## Development
 
 Live reload is set up out of the box, powered by:
+
 - [Air](https://github.com/air-verse/air) - Go hot reload
 - [esbuild](cmd/web/build/main.go) - TypeScript/JavaScript bundling
 - [templ](https://templ.guide/) - Template hot reload
@@ -171,7 +174,7 @@ This starter kit uses **modern native CSS** - no Tailwind, no frameworks.
     padding: var(--space-sm) var(--space-md);
     background: var(--color-primary);
     border-radius: var(--radius-md);
-    
+
     &:hover {
       background: var(--color-primary-dark);
     }
@@ -187,17 +190,20 @@ The TODO table is built as a Lit web component that integrates seamlessly with D
 
 ```typescript
 // web/libs/lit/src/my-component.ts
-import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { LitElement, html, css } from "lit";
+import { customElement, property } from "lit/decorators.js";
 
-@customElement('my-component')
+@customElement("my-component")
 export class MyComponent extends LitElement {
-  @property({ type: String }) message = '';
-  
+  @property({ type: String }) message = "";
+
   static styles = css`
-    :host { display: block; padding: var(--space-md); }
+    :host {
+      display: block;
+      padding: var(--space-md);
+    }
   `;
-  
+
   render() {
     return html`<div>${this.message}</div>`;
   }
@@ -253,6 +259,7 @@ Pull requests and feature requests are welcome!
 ## References
 
 ### Backend
+
 - [Go](https://go.dev/)
 - [SQLite](https://www.sqlite.org/)
 - [sqlc](https://sqlc.dev/)
@@ -261,6 +268,7 @@ Pull requests and feature requests are welcome!
 - [Chi Router](https://github.com/go-chi/chi)
 
 ### Frontend
+
 - [Datastar Client](https://www.jsdelivr.com/package/gh/starfederation/datastar)
 - [Lit](https://lit.dev/)
 - [esbuild](https://esbuild.github.io/)

@@ -42,9 +42,9 @@ tasks:
     desc: Generate Go code from templ templates
     aliases: [build:templ]
     sources:
-      - web/ui/templates/**/*.templ
+      - features/**/*.templ
     generates:
-      - web/ui/templates/**/*_templ.go
+      - features/**/*_templ.go
     cmds:
       - templ generate
 
@@ -58,7 +58,7 @@ tasks:
       - generate:all
       - build:web:all
     cmds:
-      - go build -o bin/server cmd/web/main.go
+      - go build -o bin/server cmd/server/main.go
 
   build:web:all:
     desc: Build all web assets
@@ -70,26 +70,25 @@ tasks:
     desc: Bundle CSS with design tokens
     sources:
       - tokens/**/*.css
-      - web/ui/styles/**/*.css
+      - web/src/styles/**/*.css
     generates:
-      - web/resources/static/styles.css
+      - public/styles.css
     cmds:
-      - mkdir -p web/resources/static
+      - mkdir -p public
       - |
         cat \
           tokens/index.css \
-          web/ui/styles/main.css \
-          > web/resources/static/styles.css
+          web/src/styles/main.css \
+          > public/styles.css
 
   build:web:bundle:
     desc: Bundle JavaScript/TypeScript with esbuild
     sources:
-      - web/libs/**/*.ts
-      - web/ui/components/**/*.ts
+      - web/src/components/**/*.ts
     generates:
-      - web/resources/static/libs/*.js
+      - public/libs/*.js
     cmds:
-      - go run cmd/web/build/main.go
+      - go run cmd/server/build/main.go
 
   # ====================
   # Database Commands
@@ -131,7 +130,7 @@ tasks:
     cmds:
       - rm -rf bin/
       - rm -rf tmp/
-      - rm -rf web/resources/static/
+      - rm -rf public/
       - find . -name '*_templ.go' -delete
 
   # ====================

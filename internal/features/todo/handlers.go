@@ -1,4 +1,4 @@
-package handlers
+package todo
 
 import (
 	"context"
@@ -6,16 +6,53 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/yourusername/datastar-go-starter-kit/internal/app/services"
-	"github.com/yourusername/datastar-go-starter-kit/internal/pubsub"
-	"github.com/yourusername/datastar-go-starter-kit/web/ui/templates/components"
-	"github.com/yourusername/datastar-go-starter-kit/web/ui/templates/pages"
+	commoncomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
+	todocomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/components"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/pages"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/platform/pubsub"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/nats-io/nats.go"
 	"github.com/starfederation/datastar-go/datastar"
 )
+
+// Helper functions
+func RequireSession(store sessions.Store, w http.ResponseWriter, r *http.Request) (string, bool) {
+	sess, err := store.Get(r, "connections")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return "", false
+	}
+
+	id, ok := sess.Values["id"].(string)
+	if !ok {
+		id = uuid.New().String()
+		sess.Values["id"] = id
+		if err := sess.Save(r, w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return "", false
+		}
+	}
+	return id, true
+}
+
+func RequireIntParam(w http.ResponseWriter, r *http.Request, param string) (int, bool) {
+	val, err := strconv.Atoi(chi.URLParam(r, param))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return 0, false
+	}
+	return val, true
+}
+
+func LogConsoleError(sse *datastar.ServerSentEventGenerator, err error) {
+	if err := sse.ConsoleError(err); err != nil {
+		slog.Error("failed to send console error", "error", err)
+	}
+}
 
 type Handlers struct {
 	todoService  *services.TodoService
@@ -90,7 +127,7 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 
 			// Send toast if present
 			if updateMsg.Toast != nil {
-				toastComponent := components.Toast(updateMsg.Toast.Message, updateMsg.Toast.Type)
+				toastComponent := commoncomponents.Toast(updateMsg.Toast.Message, updateMsg.Toast.Type)
 				if err := sse.PatchElementTempl(
 					toastComponent,
 					datastar.WithSelectorID("toast-container"),
@@ -111,24 +148,24 @@ func (h *Handlers) refreshTodos(ctx context.Context, sse *datastar.ServerSentEve
 		return err
 	}
 
-	mvc := &components.TodoMVC{
-		Mode:       components.TodoViewModeAll,
+	mvc := &todocomponents.TodoMVC{
+		Mode:       todocomponents.TodoViewModeAll,
 		EditingIdx: -1,
 	}
 
 	if len(dbTodos) == 0 {
 		h.todoService.ResetMVC(mvc)
 	} else {
-		mvc.Todos = make([]*components.Todo, len(dbTodos))
+		mvc.Todos = make([]*todocomponents.Todo, len(dbTodos))
 		for i, dbTodo := range dbTodos {
-			mvc.Todos[i] = &components.Todo{
+			mvc.Todos[i] = &todocomponents.Todo{
 				Text:      dbTodo.Task,
 				Completed: dbTodo.Completed.Int64 == 1,
 			}
 		}
 	}
 
-	return sse.PatchElementTempl(components.TodosMVCView(mvc))
+	return sse.PatchElementTempl(todocomponents.TodosMVCView(mvc))
 }
 
 // notifyUpdate publishes a NATS message to trigger UI refresh
@@ -160,7 +197,7 @@ func (h *Handlers) ResetTodos(w http.ResponseWriter, r *http.Request) {
 	// Notify via NATS (triggers SSE push)
 	h.notifyUpdate(sessionID,
 		pubsub.WithRefresh(),
-		pubsub.WithToast("Todos reset", components.ToastSuccess))
+		pubsub.WithToast("Todos reset", commoncomponents.ToastSuccess))
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -202,8 +239,8 @@ func (h *Handlers) SetMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mode := components.TodoViewMode(modeRaw)
-	if mode < components.TodoViewModeAll || mode > components.TodoViewModeCompleted {
+	mode := todocomponents.TodoViewMode(modeRaw)
+	if mode < todocomponents.TodoViewModeAll || mode > todocomponents.TodoViewModeCompleted {
 		http.Error(w, "invalid mode", http.StatusBadRequest)
 		return
 	}
@@ -325,7 +362,7 @@ func (h *Handlers) SaveEdit(w http.ResponseWriter, r *http.Request) {
 	}
 	h.notifyUpdate(sessionID,
 		pubsub.WithRefresh(),
-		pubsub.WithToast(toastMsg, components.ToastSuccess))
+		pubsub.WithToast(toastMsg, commoncomponents.ToastSuccess))
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -356,7 +393,7 @@ func (h *Handlers) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 
 	h.notifyUpdate(sessionID,
 		pubsub.WithRefresh(),
-		pubsub.WithToast("Todo deleted", components.ToastSuccess))
+		pubsub.WithToast("Todo deleted", commoncomponents.ToastSuccess))
 
 	w.WriteHeader(http.StatusOK)
 }

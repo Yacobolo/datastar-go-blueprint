@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/yourusername/datastar-go-starter-kit/internal/store/queries"
-	"github.com/yourusername/datastar-go-starter-kit/web/ui/templates/components"
+	todocomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/components"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
@@ -31,7 +31,7 @@ func (s *TodoService) Queries() *queries.Queries {
 	return s.queries
 }
 
-func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *components.TodoMVC, error) {
+func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *todocomponents.TodoMVC, error) {
 	ctx := r.Context()
 	sessionID, err := s.upsertSessionID(r, w)
 	if err != nil {
@@ -44,8 +44,8 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 		return "", nil, fmt.Errorf("failed to get todos: %w", err)
 	}
 
-	mvc := &components.TodoMVC{
-		Mode:       components.TodoViewModeAll,
+	mvc := &todocomponents.TodoMVC{
+		Mode:       todocomponents.TodoViewModeAll,
 		EditingIdx: -1,
 	}
 
@@ -58,9 +58,9 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 			return "", nil, fmt.Errorf("failed to save default todos: %w", err)
 		}
 	} else {
-		mvc.Todos = make([]*components.Todo, len(dbTodos))
+		mvc.Todos = make([]*todocomponents.Todo, len(dbTodos))
 		for i, dbTodo := range dbTodos {
-			mvc.Todos[i] = &components.Todo{
+			mvc.Todos[i] = &todocomponents.Todo{
 				Text:      dbTodo.Task,
 				Completed: dbTodo.Completed.Int64 == 1,
 			}
@@ -70,15 +70,15 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 	return sessionID, mvc, nil
 }
 
-func (s *TodoService) SaveMVC(ctx context.Context, sessionID string, mvc *components.TodoMVC) error {
+func (s *TodoService) SaveMVC(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
 	return s.saveMVCToDB(ctx, sessionID, mvc)
 }
 
-func (s *TodoService) ResetMVC(mvc *components.TodoMVC) {
+func (s *TodoService) ResetMVC(mvc *todocomponents.TodoMVC) {
 	s.resetMVC(mvc)
 }
 
-func (s *TodoService) ToggleTodo(mvc *components.TodoMVC, index int) {
+func (s *TodoService) ToggleTodo(mvc *todocomponents.TodoMVC, index int) {
 	if index < 0 {
 		setCompletedTo := false
 		for _, todo := range mvc.Todos {
@@ -96,11 +96,11 @@ func (s *TodoService) ToggleTodo(mvc *components.TodoMVC, index int) {
 	}
 }
 
-func (s *TodoService) EditTodo(mvc *components.TodoMVC, index int, text string) {
+func (s *TodoService) EditTodo(mvc *todocomponents.TodoMVC, index int, text string) {
 	if index >= 0 && index < len(mvc.Todos) {
 		mvc.Todos[index].Text = text
 	} else if index < 0 {
-		mvc.Todos = append(mvc.Todos, &components.Todo{
+		mvc.Todos = append(mvc.Todos, &todocomponents.Todo{
 			Text:      text,
 			Completed: false,
 		})
@@ -108,29 +108,29 @@ func (s *TodoService) EditTodo(mvc *components.TodoMVC, index int, text string) 
 	mvc.EditingIdx = -1
 }
 
-func (s *TodoService) DeleteTodo(mvc *components.TodoMVC, index int) {
+func (s *TodoService) DeleteTodo(mvc *todocomponents.TodoMVC, index int) {
 	if index >= 0 && index < len(mvc.Todos) {
 		mvc.Todos = append(mvc.Todos[:index], mvc.Todos[index+1:]...)
 	} else if index < 0 {
-		mvc.Todos = lo.Filter(mvc.Todos, func(todo *components.Todo, i int) bool {
+		mvc.Todos = lo.Filter(mvc.Todos, func(todo *todocomponents.Todo, i int) bool {
 			return !todo.Completed
 		})
 	}
 }
 
-func (s *TodoService) SetMode(mvc *components.TodoMVC, mode components.TodoViewMode) {
+func (s *TodoService) SetMode(mvc *todocomponents.TodoMVC, mode todocomponents.TodoViewMode) {
 	mvc.Mode = mode
 }
 
-func (s *TodoService) StartEditing(mvc *components.TodoMVC, index int) {
+func (s *TodoService) StartEditing(mvc *todocomponents.TodoMVC, index int) {
 	mvc.EditingIdx = index
 }
 
-func (s *TodoService) CancelEditing(mvc *components.TodoMVC) {
+func (s *TodoService) CancelEditing(mvc *todocomponents.TodoMVC) {
 	mvc.EditingIdx = -1
 }
 
-func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *components.TodoMVC) error {
+func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
 	// Delete all existing todos for this user
 	if err := s.queries.DeleteAllTodosByUser(ctx, sessionID); err != nil {
 		return fmt.Errorf("failed to delete existing todos: %w", err)
@@ -157,9 +157,9 @@ func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *co
 	return nil
 }
 
-func (s *TodoService) resetMVC(mvc *components.TodoMVC) {
-	mvc.Mode = components.TodoViewModeAll
-	mvc.Todos = []*components.Todo{
+func (s *TodoService) resetMVC(mvc *todocomponents.TodoMVC) {
+	mvc.Mode = todocomponents.TodoViewModeAll
+	mvc.Todos = []*todocomponents.Todo{
 		{Text: "Learn any backend language", Completed: true},
 		{Text: "Learn Datastar", Completed: false},
 		{Text: "Create Hypermedia", Completed: false},
