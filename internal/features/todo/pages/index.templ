@@ -2,18 +2,19 @@ package pages
 
 import (
 	"github.com/yacobolo/datastar-go-starter-kit/internal/features/common/layouts"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/ui"
 	ds "github.com/Yacobolo/datastar-templ"
 )
 
 templ IndexPage(title string) {
 	@layouts.Base(title) {
-		<div class="flex flex-col w-full min-h-screen">
+		<div class={ ui.Flex, ui.FlexCol, ui.WFull, ui.MinHScreen }>
 			<div id="todos-container" { ds.Init(ds.Get("/api/todos/updates", ds.Opt("requestCancellation", "disabled")))... }>
-				<div class="flex items-center justify-center p-8">
-					<p class="text-gray-500">Loading todos...</p>
+				<div class={ ui.Flex, ui.ItemsCenter, ui.JustifyCenter, ui.P2xl }>
+					<p class={ ui.TextMuted }>Loading todos...</p>
 				</div>
 			</div>
-			<div id="toast-container" class="fixed bottom-4 right-4 space-y-2"></div>
+			<div id="toast-container" class={ ui.Fixed, ui.BottomMd, ui.RightMd, ui.SpaceYXs }></div>
 		</div>
 	}
 }

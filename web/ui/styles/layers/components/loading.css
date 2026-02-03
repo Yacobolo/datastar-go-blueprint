@@ -1,0 +1,24 @@
+@layer components {
+  .loading {
+    display: inline-block;
+  }
+
+  .loading-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .loading-dots::after {
+    content: '...';
+    display: inline-block;
+    animation: loadingDots 1.5s infinite;
+    font-weight: bold;
+  }
+
+  @keyframes loadingDots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+  }
+}

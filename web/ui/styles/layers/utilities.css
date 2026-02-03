@@ -14,11 +14,14 @@
   .gap-md { gap: var(--ui-space-md); }
   .gap-lg { gap: var(--ui-space-lg); }
   .gap-xl { gap: var(--ui-space-xl); }
+  .gap-2xl { gap: var(--ui-space-2xl); }
   
   /* Spacing - padding */
   .p-sm { padding: var(--ui-space-sm); }
   .p-md { padding: var(--ui-space-md); }
   .p-lg { padding: var(--ui-space-lg); }
+  .p-xl { padding: var(--ui-space-xl); }
+  .p-2xl { padding: var(--ui-space-2xl); }
   .px-md { padding-left: var(--ui-space-md); padding-right: var(--ui-space-md); }
   .py-md { padding-top: var(--ui-space-md); padding-bottom: var(--ui-space-md); }
   
@@ -27,6 +30,8 @@
   .mt-md { margin-top: var(--ui-space-md); }
   .mb-md { margin-bottom: var(--ui-space-md); }
   .mb-lg { margin-bottom: var(--ui-space-lg); }
+  .ml-md { margin-left: var(--ui-space-md); }
+  .space-y-xs > * + * { margin-top: var(--ui-space-xs); }
   
   /* Typography */
   .text-xs { font-size: var(--ui-type-size-xs); }
@@ -51,6 +56,9 @@
   .text-error { color: var(--ui-color-error); }
   .text-muted { color: var(--ui-color-on-surface-variant); }
   
+  /* Hover states */
+  .hover-text-primary:hover { color: var(--ui-color-primary); }
+  
   /* Sizing */
   .w-full { width: 100%; }
   .h-full { height: 100%; }
@@ -65,4 +73,17 @@
   .hidden { display: none; }
   .invisible { visibility: hidden; }
   .visible { visibility: visible; }
+  
+  /* Position */
+  .fixed { position: fixed; }
+  .bottom-md { bottom: var(--ui-space-md); }
+  .right-md { right: var(--ui-space-md); }
+  
+  /* Layout - Flex sizing */
+  .flex-1 { flex: 1; }
+  .flex-wrap { flex-wrap: wrap; }
+  
+  /* Typography - Style */
+  .italic { font-style: italic; }
+  .uppercase { text-transform: uppercase; }
 }

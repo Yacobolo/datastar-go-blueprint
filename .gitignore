@@ -22,7 +22,6 @@ go.work.sum
 
 # Generated Go files
 *_templ.go
-*.gen.go
 
 # Build artifacts
 bin/

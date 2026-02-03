@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/ui"
 	ds "github.com/Yacobolo/datastar-templ"
 )
 
@@ -21,5 +22,5 @@ templ Icon(icon string, attrs ...string) {
 }
 
 templ SseIndicator(signalName string) {
-	<div class="loading-dots text-primary" { ds.Class(ds.Pair("loading ml-4", fmt.Sprintf("$%s", signalName)))... }></div>
+	<div class={ ui.LoadingDots, ui.TextPrimary } { ds.Class(ds.Pair(ui.Loading + " " + ui.MlMd, fmt.Sprintf("$%s", signalName)))... }></div>
 }

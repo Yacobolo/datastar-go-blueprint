@@ -1,19 +1,70 @@
 @layer components {
+  /* === Main Structure === */
+  
   .todo-container {
     max-width: 800px;
     margin: 0 auto;
     padding: var(--ui-space-lg);
   }
 
-  .todo-header {
-    margin-bottom: var(--ui-space-lg);
-    text-align: center;
+  .todo-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--ui-space-md);
   }
 
-  .todo-input-group {
+  /* === Header Section === */
+  
+  .todo-header {
     display: flex;
-    gap: var(--ui-space-md);
-    margin-bottom: var(--ui-space-lg);
+    flex-direction: column;
+    gap: var(--ui-space-sm);
+  }
+
+  .todo-title-section {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-sm);
+    justify-content: center;
+  }
+
+  .todo-title {
+    font-size: var(--ui-type-size-4xl);
+    font-weight: var(--ui-weight-bold);
+    color: var(--ui-color-primary);
+  }
+
+  .todo-description {
+    text-align: center;
+    font-size: var(--ui-type-size-sm);
+    margin-bottom: var(--ui-space-md);
+  }
+
+  .todo-description a {
+    color: var(--ui-color-primary);
+  }
+
+  /* === Input Controls === */
+  
+  .todo-input-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-sm);
+  }
+
+  .todo-input {
+    flex: 1;
+    width: 100%;
+    font-size: var(--ui-type-size-lg);
+    font-style: italic;
+  }
+
+  /* === Todo List === */
+  
+  .todo-list-container {
+    max-height: calc(100vh - 400px);
+    overflow: auto;
   }
 
   .todo-list {
@@ -31,40 +82,60 @@
     border: var(--ui-border-md) solid var(--ui-color-outline);
     border-radius: var(--ui-radius-md);
     transition: background var(--ui-duration-fast) var(--ui-ease-default);
+  }
 
-    &:hover {
-      background: var(--ui-color-surface-variant);
-    }
+  .todo-item:hover {
+    background: var(--ui-color-surface-variant);
   }
 
   .todo-item-completed {
     opacity: 0.6;
   }
 
-  .todo-task {
-    flex: 1;
+  .todo-checkbox-label {
+    font-size: var(--ui-type-size-4xl);
+    cursor: pointer;
   }
 
-  .todo-task-text {
-    font-size: var(--ui-type-size-base);
-    color: var(--ui-color-on-surface);
+  .todo-text-label {
+    flex: 1;
+    font-size: var(--ui-type-size-lg);
+    cursor: pointer;
+    user-select: none;
   }
 
   .todo-task-completed {
     text-decoration: line-through;
   }
 
-  .todo-actions {
+  /* === Footer === */
+  
+  .todo-footer {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     gap: var(--ui-space-sm);
+    margin-top: var(--ui-space-md);
   }
 
-  .todo-checkbox {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
+  .todo-footer-count {
+    font-size: var(--ui-type-size-sm);
   }
 
+  .todo-footer-actions {
+    display: flex;
+    gap: var(--ui-space-xs);
+  }
+
+  .todo-help-text {
+    display: flex;
+    justify-content: center;
+    font-size: var(--ui-type-size-xs);
+  }
+
+  /* === Toast Notifications === */
+  
   .toast {
     position: fixed;
     bottom: var(--ui-space-lg);

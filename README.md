@@ -253,6 +253,52 @@ task check  # Runs tests, Go linter, and CSS linter
 
 For more details, see the [cssgen documentation](https://github.com/Yacobolo/cssgen).
 
+### Example: Todo Component Refactoring
+
+The todo component demonstrates a complete migration from Tailwind-style utility combinations to semantic, native CSS classes.
+
+**Before (Tailwind-style utilities):**
+```go
+<div class="flex flex-col gap-sm">
+    <div class="flex items-center gap-sm justify-center">
+        <h1 class="text-4xl font-bold text-primary">TODO</h1>
+    </div>
+    <div class="todo-info-box p-md rounded-md" style="background: var(--ui-color-surface);">
+        <span class="italic font-bold uppercase text-primary">single get request!</span>
+    </div>
+</div>
+```
+
+**After (Semantic native CSS with cssgen):**
+```go
+import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+
+<div class={ ui.TodoHeader }>
+    <div class={ ui.TodoTitleSection }>
+        <h1 class={ ui.TodoTitle }>TODO</h1>
+    </div>
+    <div class={ ui.Callout, ui.CalloutInfo }>
+        <div class={ ui.CalloutContent }>
+            <span class={ ui.Italic, ui.FontBold, ui.Uppercase, ui.TextPrimary }>single get request!</span>
+        </div>
+    </div>
+</div>
+```
+
+**Benefits:**
+- ✅ Self-documenting class names (`.todo-title` vs `.text-4xl .font-bold .text-primary`)
+- ✅ Consistent with design system (all values use CSS variables)
+- ✅ Type-safe with IDE autocomplete
+- ✅ Easier to maintain and refactor
+- ✅ No inline styles needed
+- ✅ Reusable components (`.callout` works across features)
+
+**Results:**
+- Adoption rate increased from 5.6% to 42.0%
+- All inline styles eliminated from todo.templ
+- Created 15+ semantic component classes
+- Added generic `.callout` component for reuse
+
 ## Type-Safe Datastar Attributes with datastar-templ
 
 This starter kit uses **datastar-templ** for compile-time type safety when working with Datastar attributes in templ templates.
