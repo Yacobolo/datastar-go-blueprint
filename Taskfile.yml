@@ -1,0 +1,121 @@
+version: "3"
+
+env:
+  STATIC_DIR: "web/resources/static"
+  DB_PATH: "./data/todos.db"
+
+tasks:
+  # Code generation tasks
+  generate:sqlc:
+    desc: Generate type-safe database code from SQL
+    cmds:
+      - sqlc generate
+    sources:
+      - "db/schema.sql"
+      - "db/queries.sql"
+    generates:
+      - "db/*.go"
+
+  generate:templ:
+    desc: Generate Go code from templ templates
+    cmds:
+      - go tool templ generate
+    sources:
+      - "**/*.templ"
+    generates:
+      - "**/*_templ.go"
+
+  generate:
+    desc: Run all code generation
+    deps:
+      - generate:sqlc
+      - generate:templ
+
+  # The `build:` tasks below are used together for production builds of a project
+  build:templ:
+    cmds:
+      - go tool templ generate
+    sources:
+      - "**/*.templ"
+    generates:
+      - "**/*_templ.go"
+
+  build:web:styles:
+    desc: Copy CSS files to static directory
+    cmds:
+      - mkdir -p $STATIC_DIR
+      - cp -r tokens $STATIC_DIR/
+      - "echo 'Note: CSS build simplified - Tailwind removed'"
+    sources:
+      - "./tokens/**/*.css"
+      - "./web/resources/**/*.css"
+
+  build:web:bundle:
+    cmds:
+      - go run cmd/web/build/main.go
+    sources:
+      - "./web/libs/**/**/*.{html,css,ts}"
+    generates:
+      - "{{.STATIC_DIR}}/libs/**"
+
+  build:
+    desc: Build production binary
+    cmds:
+      - go build -tags=prod -o bin/main ./cmd/web
+    deps:
+      - generate
+      - build:web:styles
+      - build:web:bundle
+
+  # Use this task to debug with the delve debugger
+  debug:
+    cmds:
+      - go tool dlv exec ./bin/main
+    deps:
+      - build
+
+  # Use this task to download latest version of client libs
+  download:
+    cmds:
+      - go run cmd/downloader/main.go
+
+  # The `live:` tasks below are used together for development builds and will live-reload the server
+  live:templ:
+    cmds:
+      - go tool templ generate -watch
+
+  live:web:styles:
+    desc: Watch and copy CSS files (Tailwind removed)
+    cmds:
+      - "echo 'CSS watching disabled - using static tokens'"
+
+  live:web:bundle:
+    cmds:
+      - go run cmd/web/build/main.go -watch
+
+  live:server:
+    cmds:
+      - |
+        go tool air  \
+         -build.cmd "go build -tags=dev -o tmp/bin/main ./cmd/web" \
+         -build.bin "tmp/bin/main" \
+         -build.exclude_dir "data,node_modules,web/resources/libs/datastar/node_modules,web/resources/libs/lit/node_modules" \
+         -build.include_ext "go,templ" \
+         -misc.clean_on_exit "true"
+
+  live:
+    deps:
+      - live:templ
+      - live:web:styles
+      - live:web:bundle
+      - live:server
+
+  run:
+    cmds:
+      - ./bin/main
+    deps:
+      - build
+
+  default:
+    cmds:
+      - task: live

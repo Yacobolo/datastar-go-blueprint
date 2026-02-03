@@ -1,7 +1,6 @@
 package index
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -24,13 +23,13 @@ func NewHandlers(todoService *services.TodoService) *Handlers {
 }
 
 func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
-	if err := pages.IndexPage("Northstar").Render(r.Context(), w); err != nil {
+	if err := pages.IndexPage("Datastar Go Starter Kit").Render(r.Context(), w); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
 
 func (h *Handlers) TodosSSE(w http.ResponseWriter, r *http.Request) {
-	sessionID, mvc, err := h.todoService.GetSessionMVC(w, r)
+	_, mvc, err := h.todoService.GetSessionMVC(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -38,35 +37,11 @@ func (h *Handlers) TodosSSE(w http.ResponseWriter, r *http.Request) {
 
 	sse := datastar.NewSSE(w, r)
 
-	// Watch for updates
-	ctx := r.Context()
-	watcher, err := h.todoService.WatchUpdates(ctx, sessionID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	// Send initial state
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
 		return
-	}
-	defer watcher.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case entry := <-watcher.Updates():
-			if entry == nil {
-				continue
-			}
-			if err := json.Unmarshal(entry.Value(), mvc); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			c := components.TodosMVCView(mvc)
-			if err := sse.PatchElementTempl(c); err != nil {
-				if err := sse.ConsoleError(err); err != nil {
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				}
-				return
-			}
-		}
 	}
 }
 
@@ -82,24 +57,33 @@ func (h *Handlers) ResetTodos(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Return updated state via SSE
+	sse := datastar.NewSSE(w, r)
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
+	}
 }
 
 func (h *Handlers) CancelEdit(w http.ResponseWriter, r *http.Request) {
 	sessionID, mvc, err := h.todoService.GetSessionMVC(w, r)
 	sse := datastar.NewSSE(w, r)
 	if err != nil {
-		if err := sse.ConsoleError(err); err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
+		_ = sse.ConsoleError(err)
 		return
 	}
 
 	h.todoService.CancelEditing(mvc)
 	if err := h.todoService.SaveMVC(r.Context(), sessionID, mvc); err != nil {
-		if err := sse.ConsoleError(err); err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
+		_ = sse.ConsoleError(err)
 		return
+	}
+
+	// Return updated state
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
 	}
 }
 
@@ -128,29 +112,39 @@ func (h *Handlers) SetMode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Return updated state
+	sse := datastar.NewSSE(w, r)
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
+	}
 }
 
 func (h *Handlers) ToggleTodo(w http.ResponseWriter, r *http.Request) {
 	sessionID, mvc, err := h.todoService.GetSessionMVC(w, r)
 	sse := datastar.NewSSE(w, r)
 	if err != nil {
-		if err := sse.ConsoleError(err); err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
+		_ = sse.ConsoleError(err)
 		return
 	}
 
 	i, err := h.parseIndex(w, r)
 	if err != nil {
-		if err := sse.ConsoleError(err); err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
+		_ = sse.ConsoleError(err)
 		return
 	}
 
 	h.todoService.ToggleTodo(mvc, i)
 	if err := h.todoService.SaveMVC(r.Context(), sessionID, mvc); err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		_ = sse.ConsoleError(err)
+		return
+	}
+
+	// Return updated state
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
 	}
 }
 
@@ -169,6 +163,14 @@ func (h *Handlers) StartEdit(w http.ResponseWriter, r *http.Request) {
 	h.todoService.StartEditing(mvc, i)
 	if err := h.todoService.SaveMVC(r.Context(), sessionID, mvc); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Return updated state
+	sse := datastar.NewSSE(w, r)
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
 	}
 }
 
@@ -201,6 +203,14 @@ func (h *Handlers) SaveEdit(w http.ResponseWriter, r *http.Request) {
 	h.todoService.EditTodo(mvc, i, store.Input)
 	if err := h.todoService.SaveMVC(r.Context(), sessionID, mvc); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Return updated state
+	sse := datastar.NewSSE(w, r)
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
 	}
 }
 
@@ -219,6 +229,14 @@ func (h *Handlers) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	h.todoService.DeleteTodo(mvc, i)
 	if err := h.todoService.SaveMVC(r.Context(), sessionID, mvc); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	// Return updated state
+	sse := datastar.NewSSE(w, r)
+	c := components.TodosMVCView(mvc)
+	if err := sse.PatchElementTempl(c); err != nil {
+		_ = sse.ConsoleError(err)
 	}
 }
 

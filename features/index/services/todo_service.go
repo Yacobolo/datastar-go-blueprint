@@ -9,7 +9,7 @@ import (
 	database "github.com/yourusername/datastar-go-starter-kit/db"
 	"github.com/yourusername/datastar-go-starter-kit/features/index/components"
 
-	"github.com/delaneyj/toolbelt"
+	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/samber/lo"
 )
@@ -138,7 +138,7 @@ func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *co
 			completed = 1
 		}
 
-		todoID := toolbelt.NextEncodedID()
+		todoID := uuid.New().String()
 		if err := s.queries.CreateTodo(ctx, database.CreateTodoParams{
 			ID:        todoID,
 			UserID:    sessionID,
@@ -173,7 +173,7 @@ func (s *TodoService) upsertSessionID(r *http.Request, w http.ResponseWriter) (s
 	id, ok := sess.Values["id"].(string)
 
 	if !ok {
-		id = toolbelt.NextEncodedID()
+		id = uuid.New().String()
 		sess.Values["id"] = id
 		if err := sess.Save(r, w); err != nil {
 			return "", fmt.Errorf("failed to save session: %w", err)
