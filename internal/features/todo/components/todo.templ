@@ -2,8 +2,8 @@ package todocomponents
 
 import (
 	"fmt"
-	"github.com/starfederation/datastar-go/datastar"
 	commoncomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
+	ds "github.com/Yacobolo/datastar-templ"
 )
 
 type TodoViewMode int
@@ -47,7 +47,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 	<div id="todos-container" class="todo-container">
 		<div
 			class="flex flex-col w-full gap-md"
-			data-signals={ fmt.Sprintf("{input:'%s'}", input) }
+			{ ds.Signals(ds.String("input", input))... }
 		>
 			<section class="flex flex-col gap-sm">
 				<header class="flex flex-col gap-sm">
@@ -74,9 +74,11 @@ templ TodosMVCView(mvc *TodoMVC) {
 								<button
 									id="toggleAll"
 									class="btn btn-lg btn-primary"
-									data-on:click={ datastar.PostSSE("/api/todos/-1/toggle") }
-									data-indicator="toggleAllFetching"
-									data-attrs-disabled="$toggleAllFetching"
+									{ ds.Merge(
+										ds.OnClick(ds.Post("/api/todos/-1/toggle")),
+										ds.Indicator("toggleAllFetching"),
+										ds.Attr(ds.Pair("disabled", "$toggleAllFetching")),
+									)... }
 								>
 									@commoncomponents.Icon("material-symbols:checklist")
 								</button>
@@ -114,7 +116,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 								} else {
 									<button
 										class="btn btn-sm btn-ghost"
-										data-on:click={ datastar.PutSSE("/api/todos/mode/%d", i) }
+										{ ds.OnClick(ds.Put("/api/todos/mode/%d", i))... }
 									>
 										{ TodoViewModeStrings[i] }
 									</button>
@@ -126,7 +128,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 								<div title={ fmt.Sprintf("clear %d completed todos", completed) }>
 									<button
 										class="btn btn-sm btn-error"
-										data-on:click={ datastar.DeleteSSE("/api/todos/-1") }
+										{ ds.OnClick(ds.Delete("/api/todos/-1"))... }
 									>
 										@commoncomponents.Icon("material-symbols:delete")
 									</button>
@@ -135,7 +137,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 							<div title="Reset list">
 								<button
 									class="btn btn-sm btn-secondary"
-									data-on:click={ datastar.PutSSE("/api/todos/reset") }
+									{ ds.OnClick(ds.Put("/api/todos/reset"))... }
 								>
 									@commoncomponents.Icon("material-symbols:delete-sweep")
 								</button>
@@ -158,14 +160,14 @@ templ TodoInput(i int) {
 		class="flex-1 w-full input text-lg"
 		style="font-style: italic;"
 		placeholder="What needs to be done?"
-		data-bind:input
-		data-on:keydown={ fmt.Sprintf(`
+		{ ds.Bind("input")... }
+		{ ds.OnKeyDown(fmt.Sprintf(`
 			if (evt.key !== 'Enter' || !$input.trim().length) return;
 			%s;
 			$input = '';
-		`, datastar.PutSSE("/api/todos/%d/edit",i) ) }
+		`, ds.Put("/api/todos/%d/edit",i) ))... }
 		if i >= 0 {
-			data-on:click__outside={ datastar.PutSSE("/api/todos/cancel") }
+			{ ds.OnEvent("click__outside", ds.Put("/api/todos/cancel"))... }
 		}
 	/>
 }
@@ -186,8 +188,10 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 				id={ fmt.Sprintf("toggle%d", i) }
 				class="text-4xl"
 				style="cursor: pointer;"
-				data-on:click={ datastar.PostSSE("/api/todos/%d/toggle", i) }
-				data-indicator={ fetchingSignalName }
+				{ ds.Merge(
+					ds.OnClick(ds.Post("/api/todos/%d/toggle", i)),
+					ds.Indicator(fetchingSignalName),
+				)... }
 			>
 				if todo.Completed {
 					@commoncomponents.Icon("material-symbols:check-box-outline")
@@ -199,8 +203,10 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 				id={ indicatorID }
 				class="flex-1 text-lg"
 				style="cursor: pointer; user-select: none;"
-				data-on:click={ datastar.GetSSE("/api/todos/%d/edit", i) }
-				data-indicator={ fetchingSignalName }
+				{ ds.Merge(
+					ds.OnClick(ds.Get("/api/todos/%d/edit", i)),
+					ds.Indicator(fetchingSignalName),
+				)... }
 			>
 				{ todo.Text }
 			</label>
@@ -208,10 +214,12 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 			<button
 				id={ fmt.Sprintf("delete%d", i) }
 				class="btn btn-sm btn-error"
-				data-on:click={ datastar.DeleteSSE("/api/todos/%d", i) }
+				{ ds.Merge(
+					ds.OnClick(ds.Delete("/api/todos/%d", i)),
+					ds.Indicator(fetchingSignalName),
+					ds.Attr(ds.Pair("disabled", fmt.Sprintf("$%s", fetchingSignalName))),
+				)... }
 				data-testid={ fmt.Sprintf("delete_todo%d", i) }
-				data-indicator={ fetchingSignalName }
-				data-attrs-disabled={ fetchingSignalName + "" }
 			>
 				@commoncomponents.Icon("material-symbols:close")
 			</button>

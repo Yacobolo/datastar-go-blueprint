@@ -1,6 +1,9 @@
 package components
 
-import "fmt"
+import (
+	"fmt"
+	ds "github.com/Yacobolo/datastar-templ"
+)
 
 func KVPairsAttrs(kvPairs ...string) templ.Attributes {
 	if len(kvPairs)%2 != 0 {
@@ -18,5 +21,5 @@ templ Icon(icon string, attrs ...string) {
 }
 
 templ SseIndicator(signalName string) {
-	<div class="loading-dots text-primary" data-class={ fmt.Sprintf("{'loading ml-4': $%s}", signalName) }></div>
+	<div class="loading-dots text-primary" { ds.Class(ds.Pair("loading ml-4", fmt.Sprintf("$%s", signalName)))... }></div>
 }

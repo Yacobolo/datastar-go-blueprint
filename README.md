@@ -9,6 +9,7 @@ A modern, opinionated starter kit for building reactive web applications with Go
 - [Go](https://go.dev/doc/) - Type-safe backend with excellent tooling
 - [SQLite](https://www.sqlite.org/) + [sqlc](https://sqlc.dev/) - Embedded database with type-safe queries
 - [Datastar](https://github.com/starfederation/datastar) - Hypermedia-driven reactivity
+- [datastar-templ](https://github.com/Yacobolo/datastar-templ) - Type-safe Datastar attribute helpers for templ
 - [Templ](https://templ.guide/) - Type-safe HTML templating
 - [Chi](https://github.com/go-chi/chi) - Lightweight, composable HTTP router
 
@@ -44,16 +45,23 @@ cd datastar-go-starter-kit
 go mod tidy
 ```
 
-3. Install sqlc (for database code generation)
+3. Install development tools
 
 ```shell
-go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+task tools:install
+# Installs: templ, air, sqlc, golangci-lint, cssgen
 ```
 
-4. Generate database code
+Or install individually:
+```shell
+go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+go install github.com/yacobolo/cssgen/cmd/cssgen@latest
+```
+
+4. Generate code
 
 ```shell
-sqlc generate
+task generate:all  # Generates database code, CSS constants, and templ files
 ```
 
 5. Start developing!
@@ -182,6 +190,141 @@ This starter kit uses **modern native CSS** - no Tailwind, no frameworks.
 }
 ```
 
+## Type-Safe CSS with cssgen
+
+This starter kit includes **cssgen**, a tool that generates Go constants from CSS classes and provides build-time validation.
+
+### Why Type-Safe CSS?
+
+- **Catch typos at build time** - `class="btn btn--primray"` fails compilation
+- **IDE autocomplete** - Get suggestions for all available CSS classes
+- **Refactor with confidence** - Rename `.btn-primary` and find all usages
+- **Zero runtime overhead** - Pure compile-time tool
+
+### Usage
+
+**Before (hardcoded strings):**
+```go
+<button class="btn btn-primary btn-lg">Click</button>
+```
+
+**After (type-safe constants):**
+```go
+import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+
+<button class={ ui.Btn, ui.BtnPrimary, ui.BtnLg }>Click</button>
+```
+
+### Available Commands
+
+```shell
+# Generate CSS constants from your CSS files
+task css:gen
+
+# Lint CSS usage in templ files (golangci-lint style)
+task css:lint
+
+# Full report with statistics and Quick Wins
+task css:lint:full
+
+# Weekly adoption report
+task css:report
+
+# Export Markdown report for documentation
+task css:report:md
+```
+
+### Integration
+
+CSS constants are automatically generated when you run:
+
+```shell
+task generate:all  # Runs sqlc, css:gen, and templ generation
+task dev           # Auto-regenerates on CSS file changes
+```
+
+### Linting in CI
+
+The `check` task includes CSS linting:
+
+```shell
+task check  # Runs tests, Go linter, and CSS linter
+```
+
+For more details, see the [cssgen documentation](https://github.com/Yacobolo/cssgen).
+
+## Type-Safe Datastar Attributes with datastar-templ
+
+This starter kit uses **datastar-templ** for compile-time type safety when working with Datastar attributes in templ templates.
+
+### Why datastar-templ?
+
+- **Compile-time type checking** - Catch errors before runtime
+- **IDE autocomplete** - Get suggestions for all Datastar attributes and modifiers
+- **Consistent API** - Clean, predictable functions for all Datastar features
+- **Zero runtime overhead** - Pure compile-time helpers
+
+### Usage
+
+Import the library (commonly aliased as `ds`):
+
+```go
+import ds "github.com/Yacobolo/datastar-templ"
+```
+
+**Before (inline strings):**
+```go
+<div data-signals={ fmt.Sprintf("{count: %d}", count) }>
+  <button data-on:click={ datastar.PostSSE("/increment") }>+</button>
+  <span data-text="$count"></span>
+</div>
+```
+
+**After (type-safe):**
+```go
+<div { ds.Signals(ds.Int("count", count))... }>
+  <button { ds.OnClick(ds.Post("/increment"))... }>+</button>
+  <span { ds.Text("$count")... }></span>
+</div>
+```
+
+### Common Patterns
+
+**Signals:**
+```go
+{ ds.Signals(
+    ds.String("name", ""),
+    ds.Int("count", 0),
+    ds.Bool("isOpen", false),
+    ds.JSON("user", userData),
+)... }
+```
+
+**Events:**
+```go
+{ ds.OnClick(ds.Post("/submit"))... }
+{ ds.OnInput(ds.Get("/search?q=$query"), ds.ModDebounce, ds.Ms(300))... }
+{ ds.OnEvent("custom-event", "$handler()")... }
+```
+
+**Bindings:**
+```go
+{ ds.Bind("email")... }
+{ ds.Text("$message")... }
+{ ds.Show("$isVisible")... }
+```
+
+**Multiple attributes:**
+```go
+{ ds.Merge(
+    ds.OnClick(ds.Post("/submit")),
+    ds.Indicator("loading"),
+    ds.Attr(ds.Pair("disabled", "$loading")),
+)... }
+```
+
+For more details, see the [datastar-templ documentation](https://github.com/Yacobolo/datastar-templ).
+
 ## Lit Web Components
 
 The TODO table is built as a Lit web component that integrates seamlessly with Datastar.
@@ -264,6 +407,7 @@ Pull requests and feature requests are welcome!
 - [SQLite](https://www.sqlite.org/)
 - [sqlc](https://sqlc.dev/)
 - [Datastar SDK](https://github.com/starfederation/datastar/tree/develop/sdk)
+- [datastar-templ](https://github.com/Yacobolo/datastar-templ)
 - [Templ](https://templ.guide/)
 - [Chi Router](https://github.com/go-chi/chi)
 

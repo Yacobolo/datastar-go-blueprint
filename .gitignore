@@ -58,9 +58,8 @@ data/
 *.db-wal
 
 # Project-specific
-context/
 .task/
-.opencode/plans/
+.opencode/
 
 # Build outputs (optional - can commit for simplicity)
 # web/resources/static/libs/

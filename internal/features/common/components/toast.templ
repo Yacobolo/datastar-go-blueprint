@@ -1,5 +1,7 @@
 package components
 
+import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+
 type ToastType string
 
 const (
@@ -9,12 +11,26 @@ const (
 	ToastWarning ToastType = "warning"
 )
 
+// toastTypeClass returns the type-safe CSS constant for the toast type.
+func toastTypeClass(t ToastType) string {
+	switch t {
+	case ToastSuccess:
+		return ui.ToastSuccess
+	case ToastError:
+		return ui.ToastError
+	case ToastInfo:
+		return ui.ToastInfo
+	default:
+		return ui.ToastInfo // Default to info
+	}
+}
+
 templ Toast(message string, toastType ToastType) {
 	<div 
-		class={ "toast", "toast--" + string(toastType) }
+		class={ ui.Toast, toastTypeClass(toastType) }
 		data-timeout="3000"
 		data-on-load="setTimeout(() => $el.remove(), 3000)"
 	>
-		<span class="toast__message">{ message }</span>
+		<span>{ message }</span>
 	</div>
 }

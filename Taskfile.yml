@@ -26,6 +26,7 @@ tasks:
     desc: Run all code generators
     deps:
       - generate:sqlc
+      - css:gen
       - generate:templ
 
   generate:sqlc:
@@ -47,6 +48,40 @@ tasks:
       - features/**/*_templ.go
     cmds:
       - templ generate
+
+  # ====================
+  # CSS Generation & Linting
+  # ====================
+
+  css:gen:
+    desc: Generate type-safe CSS constants from CSS files
+    sources:
+      - web/ui/styles/**/*.css
+    generates:
+      - internal/ui/styles*.gen.go
+    cmds:
+      - cssgen -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css"
+
+  css:lint:
+    desc: Lint CSS usage (golangci-lint style - issues only)
+    cmds:
+      - cssgen -lint-only -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go"
+
+  css:lint:full:
+    desc: Lint with statistics and Quick Wins (planning refactors)
+    cmds:
+      - cssgen -lint-only -output-format full -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go"
+
+  css:report:
+    desc: Generate CSS adoption report (statistics only, no issues)
+    cmds:
+      - cssgen -lint-only -output-format summary -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go"
+
+  css:report:md:
+    desc: Export CSS report to Markdown (for GitHub issues, wikis)
+    cmds:
+      - cssgen -lint-only -output-format markdown -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go" > css-report.md
+      - echo "Report saved to css-report.md"
 
   # ====================
   # Build Commands
@@ -116,6 +151,13 @@ tasks:
     cmds:
       - golangci-lint run
 
+  check:
+    desc: Run tests, lint, and CSS lint
+    cmds:
+      - task: test
+      - task: lint
+      - task: css:lint
+
   # ====================
   # Cleanup
   # ====================
@@ -127,6 +169,7 @@ tasks:
       - rm -rf tmp/
       - rm -rf web/resources/static/*
       - find . -name '*_templ.go' -delete
+      - rm -f internal/ui/styles*.gen.go
 
   # ====================
   # Tools Installation
@@ -139,12 +182,13 @@ tasks:
       - go install github.com/air-verse/air@latest
       - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - go install github.com/yacobolo/cssgen/cmd/cssgen@latest
 
   tools:check:
     desc: Check if required tools are installed
     cmds:
       - |
-        for tool in templ air sqlc golangci-lint; do
+        for tool in templ air sqlc golangci-lint cssgen; do
           if command -v $tool &> /dev/null; then
             echo "✓ $tool installed"
           else
