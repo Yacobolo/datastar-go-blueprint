@@ -56,15 +56,15 @@ func LogConsoleError(sse *datastar.ServerSentEventGenerator, err error) {
 
 type Handlers struct {
 	todoService  *services.TodoService
-	nc           *nats.Conn
+	nats         *nats.Conn
 	sessionStore sessions.Store
 }
 
-func NewHandlers(todoService *services.TodoService, nc *nats.Conn, store sessions.Store) *Handlers {
+func NewHandlers(todoService *services.TodoService, nats *nats.Conn, sessionStore sessions.Store) *Handlers {
 	return &Handlers{
 		todoService:  todoService,
-		nc:           nc,
-		sessionStore: store,
+		nats:         nats,
+		sessionStore: sessionStore,
 	}
 }
 
@@ -98,7 +98,7 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 
 	// Subscribe to NATS updates for this session
 	msgChan := make(chan *nats.Msg, 64)
-	sub, err := h.nc.ChanSubscribe(subject(sessionID), msgChan)
+	sub, err := h.nats.ChanSubscribe(subject(sessionID), msgChan)
 	if err != nil {
 		LogConsoleError(sse, err)
 		return
@@ -142,27 +142,10 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 
 // refreshTodos fetches current state and sends via SSE
 func (h *Handlers) refreshTodos(ctx context.Context, sse *datastar.ServerSentEventGenerator, sessionID string) error {
-	// Fetch todos from database
-	dbTodos, err := h.todoService.Queries().GetTodosByUser(ctx, sessionID)
+	// Get MVC state from service
+	mvc, err := h.todoService.GetMVCBySessionID(ctx, sessionID)
 	if err != nil {
 		return err
-	}
-
-	mvc := &todocomponents.TodoMVC{
-		Mode:       todocomponents.TodoViewModeAll,
-		EditingIdx: -1,
-	}
-
-	if len(dbTodos) == 0 {
-		h.todoService.ResetMVC(mvc)
-	} else {
-		mvc.Todos = make([]*todocomponents.Todo, len(dbTodos))
-		for i, dbTodo := range dbTodos {
-			mvc.Todos[i] = &todocomponents.Todo{
-				Text:      dbTodo.Task,
-				Completed: dbTodo.Completed.Int64 == 1,
-			}
-		}
 	}
 
 	return sse.PatchElementTempl(todocomponents.TodosMVCView(mvc))
@@ -170,7 +153,7 @@ func (h *Handlers) refreshTodos(ctx context.Context, sse *datastar.ServerSentEve
 
 // notifyUpdate publishes a NATS message to trigger UI refresh
 func (h *Handlers) notifyUpdate(sessionID string, opts ...pubsub.NotifyOption) {
-	if err := pubsub.Notify(h.nc, subject(sessionID), opts...); err != nil {
+	if err := pubsub.Notify(h.nats, subject(sessionID), opts...); err != nil {
 		slog.Error("failed to notify update", "error", err)
 	}
 }

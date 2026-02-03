@@ -1,15 +1,18 @@
 package todo
 
 import (
-	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gorilla/sessions"
-	"github.com/nats-io/nats.go"
 )
 
-func SetupRoutes(router chi.Router, store sessions.Store, nc *nats.Conn, todoService *services.TodoService) error {
-	handlers := NewHandlers(todoService, nc, store)
+func SetupRoutes(router chi.Router, application *app.App) error {
+	// Extract specific dependencies from App and pass to handlers
+	handlers := NewHandlers(
+		application.Services.Todo,
+		application.NATS,
+		application.SessionStore,
+	)
 
 	router.Get("/", handlers.IndexPage)
 

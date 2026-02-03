@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/platform/router"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/store"
@@ -94,8 +95,12 @@ func run(ctx context.Context) error {
 
 	slog.Info("database initialized", "path", config.Global.DBPath)
 
-	// Setup routes with NATS connection
-	if err := router.SetupRoutes(egctx, r, sessionStore, dbStore.Queries(), nc); err != nil {
+	// Wire up application dependencies
+	application := app.New(dbStore, sessionStore, nc)
+	defer application.Close()
+
+	// Setup routes with App container
+	if err := router.SetupRoutes(egctx, r, application); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}
 

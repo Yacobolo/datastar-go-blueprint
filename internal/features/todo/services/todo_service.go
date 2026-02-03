@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/yacobolo/datastar-go-starter-kit/internal/domain"
 	todocomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/components"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
 
@@ -15,20 +16,15 @@ import (
 )
 
 type TodoService struct {
-	queries *queries.Queries
-	store   sessions.Store
+	todoRepo domain.TodoRepository
+	store    sessions.Store
 }
 
-func NewTodoService(q *queries.Queries, store sessions.Store) (*TodoService, error) {
+func NewTodoService(todoRepo domain.TodoRepository, store sessions.Store) *TodoService {
 	return &TodoService{
-		queries: q,
-		store:   store,
-	}, nil
-}
-
-// Queries returns the sqlc queries instance for direct access
-func (s *TodoService) Queries() *queries.Queries {
-	return s.queries
+		todoRepo: todoRepo,
+		store:    store,
+	}
 }
 
 func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *todocomponents.TodoMVC, error) {
@@ -38,10 +34,21 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 		return "", nil, fmt.Errorf("failed to get session id: %w", err)
 	}
 
+	mvc, err := s.GetMVCBySessionID(ctx, sessionID)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return sessionID, mvc, nil
+}
+
+// GetMVCBySessionID gets the TodoMVC state for a given session ID.
+// This is used by SSE handlers that already have the session ID.
+func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (*todocomponents.TodoMVC, error) {
 	// Get todos from database
-	dbTodos, err := s.queries.GetTodosByUser(ctx, sessionID)
+	dbTodos, err := s.todoRepo.GetTodosByUser(ctx, sessionID)
 	if err != nil && err != sql.ErrNoRows {
-		return "", nil, fmt.Errorf("failed to get todos: %w", err)
+		return nil, fmt.Errorf("failed to get todos: %w", err)
 	}
 
 	mvc := &todocomponents.TodoMVC{
@@ -55,7 +62,7 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 		s.resetMVC(mvc)
 		// Save defaults to database
 		if err := s.saveMVCToDB(ctx, sessionID, mvc); err != nil {
-			return "", nil, fmt.Errorf("failed to save default todos: %w", err)
+			return nil, fmt.Errorf("failed to save default todos: %w", err)
 		}
 	} else {
 		mvc.Todos = make([]*todocomponents.Todo, len(dbTodos))
@@ -67,7 +74,7 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 		}
 	}
 
-	return sessionID, mvc, nil
+	return mvc, nil
 }
 
 func (s *TodoService) SaveMVC(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
@@ -132,7 +139,7 @@ func (s *TodoService) CancelEditing(mvc *todocomponents.TodoMVC) {
 
 func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
 	// Delete all existing todos for this user
-	if err := s.queries.DeleteAllTodosByUser(ctx, sessionID); err != nil {
+	if err := s.todoRepo.DeleteAllTodosByUser(ctx, sessionID); err != nil {
 		return fmt.Errorf("failed to delete existing todos: %w", err)
 	}
 
@@ -144,7 +151,7 @@ func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *to
 		}
 
 		todoID := uuid.New().String()
-		if err := s.queries.CreateTodo(ctx, queries.CreateTodoParams{
+		if err := s.todoRepo.CreateTodo(ctx, queries.CreateTodoParams{
 			ID:        todoID,
 			UserID:    sessionID,
 			Task:      todo.Text,

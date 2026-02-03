@@ -5,19 +5,16 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
 	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gorilla/sessions"
-	"github.com/nats-io/nats.go"
 	"github.com/starfederation/datastar-go/datastar"
 )
 
-func SetupRoutes(ctx context.Context, router chi.Router, sessionStore *sessions.CookieStore, q *queries.Queries, nc *nats.Conn) (err error) {
+func SetupRoutes(ctx context.Context, router chi.Router, application *app.App) error {
 
 	if config.Global.Environment == config.Dev {
 		setupReload(router)
@@ -25,14 +22,8 @@ func SetupRoutes(ctx context.Context, router chi.Router, sessionStore *sessions.
 
 	router.Handle("/static/*", resources.Handler())
 
-	// Create TODO service
-	todoService, err := services.NewTodoService(q, sessionStore)
-	if err != nil {
-		return err
-	}
-
 	// Setup feature routes
-	if err := todo.SetupRoutes(router, sessionStore, nc, todoService); err != nil {
+	if err := todo.SetupRoutes(router, application); err != nil {
 		return err
 	}
 
