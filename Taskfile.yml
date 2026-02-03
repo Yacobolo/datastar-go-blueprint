@@ -69,24 +69,19 @@ tasks:
   build:web:styles:
     desc: Bundle CSS with design tokens
     sources:
-      - tokens/**/*.css
-      - web/src/styles/**/*.css
+      - web/ui/styles/**/*.css
     generates:
-      - public/styles.css
+      - web/resources/static/styles.css
     cmds:
-      - mkdir -p public
-      - |
-        cat \
-          tokens/index.css \
-          web/src/styles/main.css \
-          > public/styles.css
+      - mkdir -p web/resources/static
+      - cp web/ui/styles/main.css web/resources/static/styles.css
 
   build:web:bundle:
     desc: Bundle JavaScript/TypeScript with esbuild
     sources:
-      - web/src/components/**/*.ts
+      - web/ui/components/**/*.ts
     generates:
-      - public/libs/*.js
+      - web/resources/static/libs/*.js
     cmds:
       - go run cmd/server/build/main.go
 
@@ -130,7 +125,7 @@ tasks:
     cmds:
       - rm -rf bin/
       - rm -rf tmp/
-      - rm -rf public/
+      - rm -rf web/resources/static/*
       - find . -name '*_templ.go' -delete
 
   # ====================

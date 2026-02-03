@@ -4,6 +4,7 @@ package resources
 
 import (
 	"embed"
+	"io/fs"
 	"log/slog"
 	"net/http"
 
@@ -12,15 +13,24 @@ import (
 
 var (
 	//go:embed static
-	StaticDirectory embed.FS
-	StaticSys       = hashfs.NewFS(StaticDirectory)
+	staticFiles embed.FS
+	StaticSys   *hashfs.FS
 )
 
+func init() {
+	// Strip the "static" prefix from embedded paths
+	fsys, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		panic(err)
+	}
+	StaticSys = hashfs.NewFS(fsys)
+}
+
 func Handler() http.Handler {
-	slog.Debug("static assets are embedded")
+	slog.Debug("static assets are embedded from web/static/")
 	return hashfs.FileServer(StaticSys)
 }
 
 func StaticPath(path string) string {
-	return "/" + StaticSys.HashName("static/"+path)
+	return "/" + StaticSys.HashName(path)
 }

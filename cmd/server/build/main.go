@@ -49,7 +49,7 @@ func build(ctx context.Context) error {
 	opts := api.BuildOptions{
 		EntryPointsAdvanced: []api.EntryPoint{
 			{
-				InputPath:  resources.LibsDirectoryPath + "/src/index.ts",
+				InputPath:  resources.LibsDirectoryPath + "/index.ts",
 				OutputPath: "libs/index",
 			},
 		},
@@ -59,6 +59,7 @@ func build(ctx context.Context) error {
 		MinifyIdentifiers: true,
 		MinifySyntax:      true,
 		MinifyWhitespace:  true,
+		NodePaths:         []string{"web/node_modules"},
 		Outdir:            resources.StaticDirectoryPath,
 		Sourcemap:         api.SourceMapLinked,
 		Target:            api.ESNext,

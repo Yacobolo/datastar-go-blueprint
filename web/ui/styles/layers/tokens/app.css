@@ -1,0 +1,108 @@
+/**
+ * App-Specific Tokens
+ *
+ * This file is NOT generated. Add custom tokens here.
+ * These tokens are specific to the go-scheduler application.
+ * 
+ * Updated for MD3 design system.
+ */
+
+:root {
+  /* ========================================
+   * Custom Font Family
+   * Inter loaded via Google Fonts
+   * Fallback to neo-grotesque stack (Inter, Roboto, Helvetica...)
+   * ======================================== */
+  --ui-font-body: Inter, var(--op-font-neo-grotesque);
+  --ui-font-heading: Inter, var(--op-font-neo-grotesque);
+
+  /* ========================================
+   * Layout - Navigation Rail Pattern
+   * ======================================== */
+  --nav-rail-width: 80px;
+  --nav-drawer-width: 280px;
+  --sidebar-width: var(--nav-drawer-width);
+  --sidebar-width-collapsed: var(--nav-rail-width);
+  --header-height: 44px;
+  
+  /* Shell cut-out corner radius (Databricks-style) */
+  --shell-corner-radius: 20px;
+
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  /* ========================================
+   * Extended Semantic Colors
+   * Success, Warning, Info - not in Material spec
+   * ======================================== */
+  
+  /* Success (green) */
+  --ui-color-success: light-dark(oklch(0.50 0.16 145), oklch(0.75 0.16 145));
+  --ui-color-success-on: light-dark(oklch(1.00 0 0), oklch(0.25 0.08 145));
+  --ui-color-success-container: light-dark(oklch(0.92 0.06 145), oklch(0.28 0.06 145));
+  --ui-color-success-container-on: light-dark(oklch(0.25 0.08 145), oklch(0.90 0.08 145));
+
+  /* Warning (amber/orange) */
+  --ui-color-warning: light-dark(oklch(0.60 0.15 85), oklch(0.80 0.15 85));
+  --ui-color-warning-on: light-dark(oklch(0.20 0.05 85), oklch(0.25 0.05 85));
+  --ui-color-warning-container: light-dark(oklch(0.94 0.05 85), oklch(0.28 0.05 85));
+  --ui-color-warning-container-on: light-dark(oklch(0.25 0.05 85), oklch(0.92 0.06 85));
+
+  /* Info (blue) */
+  --ui-color-info: light-dark(oklch(0.50 0.15 230), oklch(0.75 0.15 230));
+  --ui-color-info-on: light-dark(oklch(1.00 0 0), oklch(0.25 0.08 230));
+  --ui-color-info-container: light-dark(oklch(0.92 0.05 230), oklch(0.28 0.05 230));
+  --ui-color-info-container-on: light-dark(oklch(0.25 0.08 230), oklch(0.90 0.06 230));
+
+  /* ========================================
+   * Compound Border Tokens
+   * ======================================== */
+  --ui-border-subtle: var(--ui-border-thin) solid var(--ui-color-outline-variant);
+  --ui-border-default: var(--ui-border-default) solid var(--ui-color-outline);
+
+  /* ========================================
+   * Extended Spacing (2xs, 3xs not in semantic.css)
+   * ======================================== */
+  --ui-space-2xs: var(--op-size-2);
+  --ui-space-3xs: var(--op-size-1);
+
+  /* ========================================
+   * MD3 State Layer Opacities
+   * Used for hover, focus, pressed states
+   * ======================================== */
+  --ui-state-hover-opacity: 0.08;
+  --ui-state-focus-opacity: 0.12;
+  --ui-state-pressed-opacity: 0.12;
+  --ui-state-dragged-opacity: 0.16;
+
+  /* ========================================
+   * Component-Specific Shadows
+   * ======================================== */
+  --ui-shadow-elevated: 
+    0 1px 2px 0 oklch(0 0 0 / 0.05),
+    0 1px 3px 0 oklch(0 0 0 / 0.1);
+  
+  --ui-shadow-raised:
+    0 2px 4px 0 oklch(0 0 0 / 0.05),
+    0 4px 8px 0 oklch(0 0 0 / 0.1);
+
+  /* ========================================
+   * Focus Ring
+   * ======================================== */
+  --ui-focus-ring: 0 0 0 2px var(--ui-color-surface), 0 0 0 4px var(--ui-color-primary);
+}
+
+/* Dark mode shadow adjustments */
+:root[data-theme="dark"] {
+  --ui-shadow-elevated: 
+    0 1px 2px 0 oklch(0 0 0 / 0.2),
+    0 1px 3px 0 oklch(0 0 0 / 0.3);
+  
+  --ui-shadow-raised:
+    0 2px 4px 0 oklch(0 0 0 / 0.2),
+    0 4px 8px 0 oklch(0 0 0 / 0.3);
+}

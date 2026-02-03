@@ -1,0 +1,113 @@
+/**
+ * Material Design Palettes (Tier 1 Primitives)
+ * Source: Material Theme Builder
+ * Generated: 2026-01-26 13:06:14
+ *
+ * Seed: #058B8C (oklch(0.58 0.098 196))
+ * Format: OKLCH (Oklab Cylindrical)
+ * Prefix: --md-palette-*
+ *
+ * DO NOT EDIT - Regenerate with: task gen-tokens
+ */
+
+:root {
+  /* Primary palette */
+  --md-palette-primary-0: oklch(0.00 0 0);
+  --md-palette-primary-5: oklch(0.17 0.030 195);
+  --md-palette-primary-10: oklch(0.22 0.038 195);
+  --md-palette-primary-15: oklch(0.26 0.045 195);
+  --md-palette-primary-20: oklch(0.30 0.052 195);
+  --md-palette-primary-25: oklch(0.35 0.059 195);
+  --md-palette-primary-30: oklch(0.39 0.066 196);
+  --md-palette-primary-35: oklch(0.43 0.073 196);
+  --md-palette-primary-40: oklch(0.47 0.080 196);
+  --md-palette-primary-50: oklch(0.56 0.095 196);
+  --md-palette-primary-60: oklch(0.64 0.097 196);
+  --md-palette-primary-70: oklch(0.73 0.096 195);
+  --md-palette-primary-80: oklch(0.82 0.095 196);
+  --md-palette-primary-90: oklch(0.90 0.096 196);
+  --md-palette-primary-95: oklch(0.95 0.080 196);
+  --md-palette-primary-98: oklch(0.98 0.030 194);
+  --md-palette-primary-99: oklch(0.99 0.015 192);
+  --md-palette-primary-100: oklch(1.00 0 0);
+
+  /* Secondary palette */
+  --md-palette-secondary-0: oklch(0.00 0 0);
+  --md-palette-secondary-5: oklch(0.17 0.028 195);
+  --md-palette-secondary-10: oklch(0.22 0.027 195);
+  --md-palette-secondary-15: oklch(0.26 0.026 196);
+  --md-palette-secondary-20: oklch(0.31 0.026 196);
+  --md-palette-secondary-25: oklch(0.35 0.025 196);
+  --md-palette-secondary-30: oklch(0.39 0.024 196);
+  --md-palette-secondary-35: oklch(0.44 0.025 196);
+  --md-palette-secondary-40: oklch(0.48 0.024 197);
+  --md-palette-secondary-50: oklch(0.57 0.025 197);
+  --md-palette-secondary-60: oklch(0.65 0.024 193);
+  --md-palette-secondary-70: oklch(0.74 0.023 197);
+  --md-palette-secondary-80: oklch(0.83 0.024 194);
+  --md-palette-secondary-90: oklch(0.91 0.023 194);
+  --md-palette-secondary-95: oklch(0.95 0.023 197);
+  --md-palette-secondary-98: oklch(0.98 0.024 194);
+  --md-palette-secondary-99: oklch(0.99 0.015 192);
+  --md-palette-secondary-100: oklch(1.00 0 0);
+
+  /* Tertiary palette */
+  --md-palette-tertiary-0: oklch(0.00 0 0);
+  --md-palette-tertiary-5: oklch(0.18 0.049 252);
+  --md-palette-tertiary-10: oklch(0.22 0.046 254);
+  --md-palette-tertiary-15: oklch(0.27 0.045 256);
+  --md-palette-tertiary-20: oklch(0.31 0.044 256);
+  --md-palette-tertiary-25: oklch(0.35 0.043 258);
+  --md-palette-tertiary-30: oklch(0.40 0.043 256);
+  --md-palette-tertiary-35: oklch(0.44 0.043 259);
+  --md-palette-tertiary-40: oklch(0.48 0.042 259);
+  --md-palette-tertiary-50: oklch(0.57 0.042 258);
+  --md-palette-tertiary-60: oklch(0.66 0.042 259);
+  --md-palette-tertiary-70: oklch(0.74 0.042 260);
+  --md-palette-tertiary-80: oklch(0.83 0.042 261);
+  --md-palette-tertiary-90: oklch(0.91 0.042 262);
+  --md-palette-tertiary-95: oklch(0.96 0.020 267);
+  --md-palette-tertiary-98: oklch(0.98 0.008 278);
+  --md-palette-tertiary-99: oklch(0.99 0.004 300);
+  --md-palette-tertiary-100: oklch(1.00 0 0);
+
+  /* Neutral palette */
+  --md-palette-neutral-0: oklch(0.00 0 0);
+  --md-palette-neutral-5: oklch(0.18 0.003 197);
+  --md-palette-neutral-10: oklch(0.22 0.005 197);
+  --md-palette-neutral-15: oklch(0.27 0.004 197);
+  --md-palette-neutral-20: oklch(0.31 0.004 197);
+  --md-palette-neutral-25: oklch(0.35 0.004 198);
+  --md-palette-neutral-30: oklch(0.40 0.004 198);
+  --md-palette-neutral-35: oklch(0.44 0.004 198);
+  --md-palette-neutral-40: oklch(0.48 0.004 175);
+  --md-palette-neutral-50: oklch(0.57 0.002 199);
+  --md-palette-neutral-60: oklch(0.65 0.002 199);
+  --md-palette-neutral-70: oklch(0.74 0.003 167);
+  --md-palette-neutral-80: oklch(0.83 0.003 167);
+  --md-palette-neutral-90: oklch(0.91 0.003 168);
+  --md-palette-neutral-95: oklch(0.96 0.002 149);
+  --md-palette-neutral-98: oklch(0.98 0.002 168);
+  --md-palette-neutral-99: oklch(0.99 0.001 203);
+  --md-palette-neutral-100: oklch(1.00 0 0);
+
+  /* Neutral Variant palette */
+  --md-palette-neutral-variant-0: oklch(0.00 0 0);
+  --md-palette-neutral-variant-5: oklch(0.17 0.011 196);
+  --md-palette-neutral-variant-10: oklch(0.22 0.012 196);
+  --md-palette-neutral-variant-15: oklch(0.27 0.010 197);
+  --md-palette-neutral-variant-20: oklch(0.31 0.011 197);
+  --md-palette-neutral-variant-25: oklch(0.35 0.011 197);
+  --md-palette-neutral-variant-30: oklch(0.39 0.010 197);
+  --md-palette-neutral-variant-35: oklch(0.44 0.010 197);
+  --md-palette-neutral-variant-40: oklch(0.48 0.010 197);
+  --md-palette-neutral-variant-50: oklch(0.57 0.010 188);
+  --md-palette-neutral-variant-60: oklch(0.65 0.009 197);
+  --md-palette-neutral-variant-70: oklch(0.74 0.009 189);
+  --md-palette-neutral-variant-80: oklch(0.83 0.009 189);
+  --md-palette-neutral-variant-90: oklch(0.91 0.009 189);
+  --md-palette-neutral-variant-95: oklch(0.96 0.008 198);
+  --md-palette-neutral-variant-98: oklch(0.98 0.009 189);
+  --md-palette-neutral-variant-99: oklch(0.99 0.009 189);
+  --md-palette-neutral-variant-100: oklch(1.00 0 0);
+}

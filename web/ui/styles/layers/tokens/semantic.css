@@ -1,0 +1,188 @@
+/**
+ * Semantic Tokens (Tier 2) - THE APPLICATION API
+ * Source: Generated from color-theme.json and design-tokens.yaml
+ * Generated: 2026-01-26 13:06:14
+ *
+ * Naming: --ui-[category]-[role]-[variant]
+ * 
+ * This is the ONLY file developers should reference.
+ * All tokens start with --ui-
+ * 
+ * Uses CSS light-dark() for reactive theming.
+ *
+ * DO NOT EDIT - Regenerate with: task gen-tokens
+ */
+
+@layer ui.theme {
+  :root {
+    color-scheme: light dark;
+
+    /* Primary */
+    --ui-color-primary: light-dark(oklch(0.47 0.080 196), oklch(0.82 0.082 197));
+    --ui-color-primary-on: light-dark(oklch(1.00 0 0), oklch(0.30 0.052 195));
+    --ui-color-primary-container: light-dark(oklch(0.90 0.082 196), oklch(0.39 0.066 196));
+    --ui-color-primary-container-on: light-dark(oklch(0.39 0.066 196), oklch(0.90 0.082 196));
+
+    /* Secondary */
+    --ui-color-secondary: light-dark(oklch(0.48 0.030 196), oklch(0.82 0.030 194));
+    --ui-color-secondary-on: light-dark(oklch(1.00 0 0), oklch(0.31 0.031 199));
+    --ui-color-secondary-container: light-dark(oklch(0.91 0.030 194), oklch(0.39 0.031 196));
+    --ui-color-secondary-container-on: light-dark(oklch(0.39 0.031 196), oklch(0.91 0.030 194));
+
+    /* Tertiary */
+    --ui-color-tertiary: light-dark(oklch(0.48 0.052 257), oklch(0.83 0.052 259));
+    --ui-color-tertiary-on: light-dark(oklch(1.00 0 0), oklch(0.31 0.054 255));
+    --ui-color-tertiary-container: light-dark(oklch(0.91 0.042 262), oklch(0.40 0.053 256));
+    --ui-color-tertiary-container-on: light-dark(oklch(0.40 0.053 256), oklch(0.91 0.042 262));
+
+    /* Surface */
+    --ui-color-surface: light-dark(oklch(0.98 0.008 188), oklch(0.19 0.011 186));
+    --ui-color-surface-on: light-dark(oklch(0.22 0.010 197), oklch(0.91 0.008 188));
+    --ui-color-surface-variant: light-dark(oklch(0.91 0.012 191), oklch(0.40 0.013 190));
+    --ui-color-surface-variant-on: light-dark(oklch(0.40 0.013 190), oklch(0.83 0.011 197));
+    --ui-color-surface-container: light-dark(oklch(0.95 0.007 186), oklch(0.24 0.010 197));
+    --ui-color-surface-container-low: light-dark(oklch(0.97 0.007 186), oklch(0.22 0.010 197));
+    --ui-color-surface-container-lowest: light-dark(oklch(1.00 0 0), oklch(0.16 0.009 196));
+    --ui-color-surface-container-high: light-dark(oklch(0.93 0.006 198), oklch(0.28 0.008 197));
+    --ui-color-surface-container-highest: light-dark(oklch(0.91 0.008 188), oklch(0.33 0.010 197));
+    --ui-color-surface-dim: light-dark(oklch(0.89 0.007 198), oklch(0.19 0.011 186));
+    --ui-color-surface-bright: light-dark(oklch(0.98 0.008 188), oklch(0.34 0.008 197));
+
+    /* Background */
+    --ui-color-background: light-dark(oklch(0.98 0.008 188), oklch(0.19 0.011 186));
+    --ui-color-background-on: light-dark(oklch(0.22 0.010 197), oklch(0.91 0.008 188));
+
+    /* Error */
+    --ui-color-error: light-dark(oklch(0.51 0.193 28), oklch(0.84 0.089 27));
+    --ui-color-error-on: light-dark(oklch(1.00 0 0), oklch(0.33 0.134 27));
+    --ui-color-error-container: light-dark(oklch(0.92 0.042 25), oklch(0.42 0.170 27));
+    --ui-color-error-container-on: light-dark(oklch(0.42 0.170 27), oklch(0.92 0.042 25));
+
+    /* Outline */
+    --ui-color-outline: light-dark(oklch(0.57 0.012 197), oklch(0.65 0.013 191));
+    --ui-color-outline-variant: light-dark(oklch(0.83 0.011 197), oklch(0.40 0.013 190));
+
+    /* Inverse */
+    --ui-color-inverse-surface: light-dark(oklch(0.31 0.010 186), oklch(0.91 0.008 188));
+    --ui-color-inverse-surface-on: light-dark(oklch(0.96 0.007 186), oklch(0.31 0.010 186));
+    --ui-color-inverse-primary: light-dark(oklch(0.82 0.082 197), oklch(0.47 0.080 196));
+
+    /* Utility */
+    --ui-color-scrim: light-dark(oklch(0.00 0 0), oklch(0.00 0 0));
+    --ui-color-shadow-color: light-dark(oklch(0.00 0 0), oklch(0.00 0 0));
+
+    /* Surface */
+    --ui-color-surface-tint: light-dark(oklch(0.47 0.080 196), oklch(0.82 0.082 197));
+
+    /* Shadow Color (for atomic shadows) */
+    --ui-color-shadow: light-dark(oklch(0 0 0 / 0.1), oklch(0 0 0 / 0.6));
+
+    /* Shadow Hue (derived from seed color) */
+    --ui-shadow-hue: 180;
+
+    /* Spacing Scale */
+    --ui-space-3xs: var(--op-size-1);
+    --ui-space-xxs: var(--op-size-1);
+    --ui-space-xs: var(--op-size-2);
+    --ui-space-sm: var(--op-size-3);
+    --ui-space-md: var(--op-size-4);
+    --ui-space-lg: var(--op-size-5);
+    --ui-space-xl: var(--op-size-6);
+    --ui-space-2xl: var(--op-size-7);
+    --ui-space-3xl: var(--op-size-8);
+    --ui-space-4xl: var(--op-size-9);
+
+    /* Fluid Spacing */
+    --ui-space-fluid-sm: var(--op-size-fluid-1);
+    --ui-space-fluid-md: var(--op-size-fluid-2);
+    --ui-space-fluid-lg: var(--op-size-fluid-3);
+    --ui-space-fluid-xl: var(--op-size-fluid-4);
+
+    /* Typography Sizes */
+    --ui-type-size-xs: var(--op-size-fluid-1);
+    --ui-type-size-sm: var(--op-size-3);
+    --ui-type-size-base: var(--op-size-4);
+    --ui-type-size-lg: var(--op-size-5);
+    --ui-type-size-xl: var(--op-size-6);
+    --ui-type-size-2xl: var(--op-size-7);
+    --ui-type-size-3xl: var(--op-size-8);
+    --ui-type-size-4xl: var(--op-size-9);
+    --ui-type-size-5xl: var(--op-size-10);
+
+    /* Line Heights */
+    --ui-leading-none: 1;
+    --ui-leading-tight: var(--op-font-lineheight-1);
+    --ui-leading-snug: var(--op-font-lineheight-2);
+    --ui-leading-normal: var(--op-font-lineheight-3);
+    --ui-leading-relaxed: var(--op-font-lineheight-4);
+    --ui-leading-loose: var(--op-font-lineheight-5);
+
+    /* Font Weights */
+    --ui-weight-light: var(--op-font-weight-3);
+    --ui-weight-normal: var(--op-font-weight-4);
+    --ui-weight-medium: var(--op-font-weight-5);
+    --ui-weight-semibold: var(--op-font-weight-6);
+    --ui-weight-bold: var(--op-font-weight-7);
+
+    /* Font Families */
+    --ui-font-body: var(--op-font-sans);
+    --ui-font-code: var(--op-font-mono);
+    --ui-font-heading: var(--op-font-sans);
+
+    /* Border Radii */
+    --ui-radius-sm: var(--op-radius-1);
+    --ui-radius-md: var(--op-radius-2);
+    --ui-radius-lg: var(--op-radius-3);
+    --ui-radius-xl: var(--op-radius-4);
+    --ui-radius-full: var(--op-radius-round);
+    --ui-radius-none: 0;
+
+    /* Border Widths */
+    --ui-border-default: var(--op-border-size-2);
+    --ui-border-none: 0;
+    --ui-border-thick: var(--op-border-size-3);
+    --ui-border-thin: var(--op-border-size-1);
+
+    /* Shadows */
+    --ui-shadow-sm: var(--op-shadow-1);
+    --ui-shadow-md: var(--op-shadow-3);
+    --ui-shadow-lg: var(--op-shadow-5);
+    --ui-shadow-xl: var(--op-shadow-6);
+    --ui-shadow-none: none;
+
+    /* Z-Index Layers */
+    --ui-layer-base: var(--op-layer-1);
+    --ui-layer-raised: var(--op-layer-2);
+    --ui-layer-dropdown: var(--op-layer-3);
+    --ui-layer-sticky: var(--op-layer-4);
+    --ui-layer-modal: var(--op-layer-5);
+
+    /* Easings */
+    --ui-ease-bounce: var(--op-ease-squish-2);
+    --ui-ease-default: var(--op-ease-3);
+    --ui-ease-in-out: var(--op-ease-in-out-3);
+    --ui-ease-out: var(--op-ease-out-3);
+
+    /* Durations */
+    --ui-duration-fast: 150ms;
+    --ui-duration-instant: 0ms;
+    --ui-duration-normal: 300ms;
+    --ui-duration-slow: 500ms;
+
+    /* Content Widths */
+    --ui-content-width-narrow: var(--op-size-content-1);
+    --ui-content-width-prose: var(--op-size-content-3);
+    --ui-content-width-wide: var(--op-size-content-2);
+
+    /* Breakpoints */
+    --ui-breakpoint-desktop: var(--op-size-lg);
+    --ui-breakpoint-laptop: var(--op-size-md);
+    --ui-breakpoint-mobile: var(--op-size-xs);
+    --ui-breakpoint-tablet: var(--op-size-sm);
+    --ui-breakpoint-wide: var(--op-size-xl);
+  }
+
+  /* Theme Toggles */
+  :root[data-theme="light"] { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+}

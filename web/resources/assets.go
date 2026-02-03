@@ -1,7 +1,8 @@
 package resources
 
 const (
-	LibsDirectoryPath   = "web/src/components"
-	StylesDirectoryPath = "web/src/styles"
-	StaticDirectoryPath = "public"
+	LibsDirectoryPath   = "web/ui/components"
+	StylesDirectoryPath = "web/ui/styles"
+	TokensDirectoryPath = "web/ui/styles/layers/tokens"
+	StaticDirectoryPath = "web/resources/static"
 )

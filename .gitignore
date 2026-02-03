@@ -62,5 +62,11 @@ context/
 .task/
 .opencode/plans/
 
+# Build outputs (optional - can commit for simplicity)
+# web/resources/static/libs/
+# web/resources/static/styles.css
+# web/resources/static/datastar/
+web/src/styles/daisyui/
+
 # OS files
 .DS_Store

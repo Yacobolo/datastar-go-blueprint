@@ -1,0 +1,113 @@
+/**
+ * Durations Tokens
+ * Source: Open Props (https://open-props.style)
+ * Generated: 2026-01-26 13:06:14
+ *
+ * DO NOT EDIT - Regenerate with: task gen-tokens
+ */
+
+:root {
+
+    /* Animation duration based on https://design.brainly.com/8adfd5f36/p/091f75-ux-motion */
+    --op-duration-instant:    0ms;    /* e.g. text change */
+    --op-duration-quick-1:    80ms;   /* e.g. checkbox, radio, hover */
+    --op-duration-quick-2:    120ms;  /* e.g. toggle, tab, chip, color, fade */
+    --op-duration-moderate-1: 180ms;  /* e.g. dropdown, tooltip */
+    --op-duration-moderate-2: 260ms;  /* e.g. modal, toast, dialog, notification */
+    --op-duration-gentle-1:   320ms;  /* e.g. bottom sheet, card expand */
+    --op-duration-gentle-2:   420ms;  /* e.g. advanced animations */
+
+    /* 
+     * Calculated animation duration based on https://design.brainly.com/8adfd5f36/p/091f75-ux-motion/t/page-091f75-75547432-5018fa-12
+     * Demo: https://codepen.io/T3sT3ro/pen/RNwRLWx
+     * unitless 
+     */
+    --op-animated-element-distance: 0;
+    --op-animated-element-width:    0;
+    --op-animated-element-height:   0;
+    
+    /* Calculated animation duration in milliseconds */
+    --op-duration-calculated: calc(((0.5  * var(--animated-element-distance, 0)) +
+                                 (0.35 * var(--animated-element-width, 0)) +
+                                 (0.3  * var(--animated-element-height, 0))) * 1ms);
+
+    /* Common time units */
+    --op-minute:     60s;
+    --op-hour:       calc( 60 * var(--minute));
+    --op-day:        calc( 24 * var(--hour));
+    --op-week:       calc(  7 * var(--day));
+    --op-fortnight:  calc( 14 * var(--day));
+    --op-month:      calc( 30 * var(--day));
+    --op-quarter:    calc( 13 * var(--week));
+    --op-year:       calc(365 * var(--day));
+    --op-leap-year:  calc(366 * var(--day));
+    --op-olympiad:   calc(  4 * var(--year));
+    --op-decade:     calc( 10 * var(--year));
+    --op-generation: calc(  3 * var(--decade));
+    --op-lifetime:   calc(  8 * var(--decade));
+
+    --op-work-day:  calc( 8 * var(--hour));
+    --op-work-week: calc( 5 * var(--day));
+
+    --op-blink:           .1s;
+    --op-flinch:          .3s;
+    --op-sneeze:          .5s;
+    --op-brief-moment:    15s;
+    --op-pause:           10s;
+    --op-unhealthy-pause: 30s;
+
+    /*
+     * https://en.wikipedia.org/wiki/List_of_unusual_units_of_measurement
+     */
+    --op-moment:          90s;
+    --op-kermit:          calc(14.4 * var(--minute));
+    --op-microfortnight:  1.2096s;
+
+    /* Approximate astronomical durations */
+    --op-sidereal-day: calc((23 * var(--hour)) + (56 * var(--minute)) + 4.091s);
+    --op-iss-orbit:    calc(91.5 * var(--minute));
+    --op-lunar-month:  calc(29.5 * var(--day));
+    --op-venus-year:   calc(225  * var(--day));
+    --op-sol:          88775s;
+    --op-mars-year:    calc(668.5907 * var(--sol));
+
+    /*
+     * 10 Little-Known Units of Time
+     * https://www.mentalfloss.com/article/60080/10-little-known-units-time
+     */
+    --op-atom: .15957s;
+    --op-ghurry: calc(24 * var(--minute));
+    --op-lustre: calc(5 * var(--year));
+    --op-mileway: calc(20 * var(--minute));
+    --op-nundine: calc(9 * var(--day));
+    --op-nychthemeron: var(--day);
+    --op-punct: calc(15 * var(--minute));
+    --op-quadrant: calc(6 * var(--hour));
+    --op-quinzieme: calc(15 * var(--day));
+    --op-scruple: calc(24 * var(--minute));
+
+    /*
+     * The Potrzebie System of Weights and Measures
+     * https://madcoversite.com/mad033-36.html
+     * https://webmadness.net/resources/The-Potrzebie-system-of-weights-and-measures.pdf
+     *
+     * There is an inconsistency in the definitions where 1 wolverton = 0.00001 clarke.
+     * Calculating fractions of clarkes suggests that a 1 wolverton = 0.00000001 clarke. 
+     */
+    --op-clarke: var(--sidereal-day);
+    --op-wood: calc(0.1 * var(--clarke));
+    --op-martin: calc(0.01 * var(--wood));
+    --op-kovac: calc(0.01 * var(--martin));
+    --op-wolverton: calc(0.001 * var(--kovac));
+    --op-mingo: calc(10 * var(--clarke));
+    --op-cowznofski: calc(10 * var(--mingo));
+
+    /*
+     * https://en.wikipedia.org/wiki/List_of_humorous_units_of_measurement
+     */
+    --op-friedman: calc(6 * var(--month));
+    --op-jiffy: 0.01s;
+    --op-microcentury: calc((52 * var(--minute)) + 35.7s);
+    --op-nanocentury: 3.156s;
+    --op-scaramucci: calc(11 * var(--day));
+}
