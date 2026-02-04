@@ -1,6 +1,10 @@
 package components
 
-import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+import (
+	"github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+
+	ds "github.com/Yacobolo/datastar-templ"
+)
 
 type ToastType string
 
@@ -26,10 +30,9 @@ func toastTypeClass(t ToastType) string {
 }
 
 templ Toast(message string, toastType ToastType) {
-	<div 
+	<div
 		class={ ui.Toast, toastTypeClass(toastType) }
-		data-timeout="3000"
-		data-on-load="setTimeout(() => $el.remove(), 3000)"
+		{ ds.Init("el.style.opacity = '0'; setTimeout(() => el.remove(), 300)", ds.ModDelay, ds.Ms(3000))... }
 	>
 		<span>{ message }</span>
 	</div>
