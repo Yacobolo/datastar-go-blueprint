@@ -2,7 +2,7 @@ package todocomponents
 
 import (
 	"fmt"
-	commoncomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/ui"
 	ds "github.com/Yacobolo/datastar-templ"
 )
@@ -52,25 +52,9 @@ templ TodosMVCView(mvc *TodoMVC) {
 		>
 			<section class={ ui.TodoHeader }>
 				<header class={ ui.TodoHeader }>
-					<div class={ ui.Callout, ui.CalloutInfo }>
-						@commoncomponents.Icon("material-symbols:info")
-						<div class={ ui.CalloutContent }>
-							<p>
-								<div class={ ui.TextSm }>
-									This mini application is driven by a
-									<span class={ ui.Italic, ui.FontBold, ui.Uppercase, ui.TextPrimary }>single get request!</span>
-									<br/>
-									As you interact with the UI, the backend state is updated and new partial HTML fragments are sent down to the client via Server-Sent Events.  You can make simple apps or full blown SPA replacements with this pattern.  Open your dev tools and watch the network tab to see the magic happen (you will want to look for the "/todos" Network/EventStream tab).
-								</div>
-							</p>
-						</div>
-					</div>
 					<div class={ ui.TodoTitleSection }>
-						<h1 class={ ui.TodoTitle }>TODO</h1>
+						<h1 class={ ui.TodoTitle }>todos</h1>
 					</div>
-					<h2 class={ ui.TodoDescription }>
-						The input is bound to a local store, but this is not a single page application.  It is like having <a href="https://htmx.org" target="_blank">HTMX</a> + <a href="https://alpinejs.dev/" target="_blank">Alpine.js</a> but with just one API to learn and much easier to extend.
-					</h2>
 					<div class={ ui.TodoInputControls }>
 						if hasTodos {
 							<div title="toggle all todos">
@@ -83,14 +67,14 @@ templ TodosMVCView(mvc *TodoMVC) {
 										ds.Attr(ds.Pair("disabled", "$toggleAllFetching")),
 									)... }
 								>
-									@commoncomponents.Icon("material-symbols:checklist")
+									@components.Icon("material-symbols:checklist")
 								</button>
 							</div>
 						}
 						if mvc.EditingIdx <0 {
 							@TodoInput(-1)
 						}
-						@commoncomponents.SseIndicator("toggleAllFetching")
+						@components.SseIndicator("toggleAllFetching")
 					</div>
 				</header>
 				if hasTodos {
@@ -133,7 +117,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 										class={ ui.Btn, ui.BtnSm, ui.BtnError }
 										{ ds.OnClick(ds.Delete("/api/todos/-1"))... }
 									>
-										@commoncomponents.Icon("material-symbols:delete")
+										@components.Icon("material-symbols:delete")
 									</button>
 								</div>
 							}
@@ -142,13 +126,10 @@ templ TodosMVCView(mvc *TodoMVC) {
 									class={ ui.Btn, ui.BtnSm, ui.BtnSecondary }
 									{ ds.OnClick(ds.Put("/api/todos/reset"))... }
 								>
-									@commoncomponents.Icon("material-symbols:delete-sweep")
+									@components.Icon("material-symbols:delete-sweep")
 								</button>
 							</div>
 						</div>
-					</footer>
-					<footer class={ ui.TodoHelpText }>
-						<div>Click to edit, click away to cancel, press enter to save.</div>
 					</footer>
 				}
 			</section>
@@ -195,9 +176,9 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 				)... }
 			>
 				if todo.Completed {
-					@commoncomponents.Icon("material-symbols:check-box-outline")
+					@components.Icon("material-symbols:check-box-outline")
 				} else {
-					@commoncomponents.Icon("material-symbols:check-box-outline-blank")
+					@components.Icon("material-symbols:check-box-outline-blank")
 				}
 			</label>
 			<label
@@ -210,7 +191,7 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 			>
 				{ todo.Text }
 			</label>
-			@commoncomponents.SseIndicator(fetchingSignalName)
+			@components.SseIndicator(fetchingSignalName)
 			<button
 				id={ fmt.Sprintf("delete%d", i) }
 				class={ ui.Btn, ui.BtnSm, ui.BtnError }
@@ -221,7 +202,7 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 				)... }
 				data-testid={ fmt.Sprintf("delete_todo%d", i) }
 			>
-				@commoncomponents.Icon("material-symbols:close")
+				@components.Icon("material-symbols:close")
 			</button>
 		</li>
 	}

@@ -7,6 +7,15 @@ import (
 // Header renders the app header with theme toggle
 templ Header(title string) {
 	<header class="app-header">
+		<!-- Mobile Menu Toggle -->
+		<button
+			class="header-menu-toggle"
+			{ ds.OnClick("$sidebarOpen = !$sidebarOpen")... }
+			aria-label="Open menu"
+			type="button"
+		>
+			@IconMenu()
+		</button>
 		<!-- App Title/Logo -->
 		<div class="header-title">
 			<h1>{ title }</h1>

@@ -21,6 +21,28 @@
   }
 
   /* ========================================
+   * Mobile Menu Toggle
+   * ======================================== */
+
+  .header-menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: var(--ui-radius-md);
+    color: var(--ui-color-surface-variant-on);
+    cursor: pointer;
+    transition: background var(--ui-duration-fast) var(--ui-ease-default);
+  }
+
+  .header-menu-toggle:hover {
+    background: var(--ui-color-surface-container-high);
+  }
+
+  /* ========================================
    * Header Title
    * ======================================== */
 
@@ -86,6 +108,10 @@
   @media (max-width: 768px) {
     .app-header {
       padding: var(--ui-space-sm) var(--ui-space-md);
+    }
+
+    .header-menu-toggle {
+      display: flex;
     }
     
     .header-title h1 {

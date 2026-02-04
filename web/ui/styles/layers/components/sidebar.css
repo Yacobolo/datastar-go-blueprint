@@ -1,0 +1,253 @@
+/**
+ * Sidebar Component
+ * Simple collapsible navigation sidebar
+ * 100% token-based styling for easy customization
+ */
+
+@layer components {
+  /* ========================================
+   * Sidebar Variables
+   * ======================================== */
+  
+  :root {
+    --sidebar-width: 240px;
+    --sidebar-width-collapsed: 64px;
+  }
+
+  /* ========================================
+   * Sidebar Container
+   * ======================================== */
+
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    background: var(--ui-color-surface-container);
+    border-right: var(--ui-border-thin) solid var(--ui-color-outline-variant);
+    transition: width var(--ui-duration-normal) var(--ui-ease-out);
+    z-index: var(--ui-layer-sticky);
+  }
+
+  .app-sidebar--collapsed {
+    width: var(--sidebar-width-collapsed);
+  }
+
+  /* Mobile sidebar */
+  .app-sidebar--mobile {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    transition: transform var(--ui-duration-normal) var(--ui-ease-out);
+    z-index: var(--ui-layer-modal);
+    box-shadow: var(--ui-shadow-lg);
+  }
+
+  .app-sidebar--mobile.app-sidebar--open {
+    transform: translateX(0);
+  }
+
+  /* ========================================
+   * Sidebar Header / Logo
+   * ======================================== */
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--ui-space-md);
+    min-height: 60px;
+    border-bottom: var(--ui-border-thin) solid var(--ui-color-outline-variant);
+  }
+
+  .app-sidebar:not(.app-sidebar--collapsed) .sidebar-header {
+    justify-content: flex-start;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-sm);
+    text-decoration: none;
+    color: var(--ui-color-surface-on);
+    font-weight: var(--ui-weight-semibold);
+  }
+
+  .sidebar-logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--ui-color-primary);
+    color: var(--ui-color-primary-on);
+    border-radius: var(--ui-radius-md);
+    font-size: var(--ui-type-size-sm);
+    font-weight: var(--ui-weight-bold);
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo-text {
+    font-size: var(--ui-type-size-base);
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity var(--ui-duration-fast) var(--ui-ease-default);
+  }
+
+  .app-sidebar--collapsed .sidebar-logo-text {
+    opacity: 0;
+    width: 0;
+  }
+
+  /* ========================================
+   * Navigation
+   * ======================================== */
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--ui-space-sm);
+  }
+
+  .nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-2xs);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-sm);
+    padding: var(--ui-space-sm) var(--ui-space-md);
+    border-radius: var(--ui-radius-md);
+    text-decoration: none;
+    color: var(--ui-color-surface-variant-on);
+    font-size: var(--ui-type-size-sm);
+    font-weight: var(--ui-weight-medium);
+    transition: 
+      background var(--ui-duration-fast) var(--ui-ease-default),
+      color var(--ui-duration-fast) var(--ui-ease-default);
+    cursor: pointer;
+  }
+
+  .nav-item:hover {
+    background: var(--ui-color-surface-container-high);
+    color: var(--ui-color-surface-on);
+  }
+
+  .nav-item--active {
+    background: var(--ui-color-primary-container);
+    color: var(--ui-color-primary-container-on);
+  }
+
+  .nav-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .nav-item-label {
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity var(--ui-duration-fast) var(--ui-ease-default);
+  }
+
+  .app-sidebar--collapsed .nav-item-label {
+    opacity: 0;
+    width: 0;
+  }
+
+  .app-sidebar--collapsed .nav-item {
+    justify-content: center;
+    padding: var(--ui-space-sm);
+  }
+
+  /* ========================================
+   * Sidebar Footer / Toggle
+   * ======================================== */
+
+  .sidebar-footer {
+    padding: var(--ui-space-sm);
+    border-top: var(--ui-border-thin) solid var(--ui-color-outline-variant);
+  }
+
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-sm);
+    width: 100%;
+    padding: var(--ui-space-sm) var(--ui-space-md);
+    background: transparent;
+    border: none;
+    border-radius: var(--ui-radius-md);
+    color: var(--ui-color-surface-variant-on);
+    font-size: var(--ui-type-size-sm);
+    font-weight: var(--ui-weight-medium);
+    cursor: pointer;
+    transition: background var(--ui-duration-fast) var(--ui-ease-default);
+  }
+
+  .sidebar-toggle:hover {
+    background: var(--ui-color-surface-container-high);
+  }
+
+  .sidebar-toggle-text {
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity var(--ui-duration-fast) var(--ui-ease-default);
+  }
+
+  .app-sidebar--collapsed .sidebar-toggle-text {
+    opacity: 0;
+    width: 0;
+  }
+
+  .app-sidebar--collapsed .sidebar-toggle {
+    justify-content: center;
+    padding: var(--ui-space-sm);
+  }
+
+  /* ========================================
+   * Mobile Overlay
+   * ======================================== */
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--ui-color-scrim);
+    opacity: 0.32;
+    z-index: calc(var(--ui-layer-modal) - 1);
+  }
+
+  /* ========================================
+   * Mobile Responsive
+   * ======================================== */
+
+  @media (max-width: 768px) {
+    /* Hide desktop sidebar on mobile */
+    .app-sidebar:not(.app-sidebar--mobile) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 769px) {
+    /* Hide mobile sidebar on desktop */
+    .app-sidebar--mobile,
+    .sidebar-overlay {
+      display: none;
+    }
+  }
+}

@@ -7,9 +7,9 @@ import (
 	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
 )
 
-// baseSignals returns the initial signals JSON for theme support
+// baseSignals returns the initial signals JSON for theme and sidebar support
 func baseSignals() string {
-	return `{"theme": "system"}`
+	return `{"theme": "system", "sidebarCollapsed": false, "sidebarOpen": false}`
 }
 
 templ Base(title string) {
@@ -40,11 +40,18 @@ templ Base(title string) {
 			}
 			<!-- App Shell -->
 			<div class="app-shell">
-				@components.Header(title)
-				<main class="app-main">
-					{ children... }
-				</main>
+				<!-- Desktop Sidebar -->
+				@components.Sidebar()
+				<!-- Content Area -->
+				<div class="app-content">
+					@components.Header(title)
+					<main class="app-main">
+						{ children... }
+					</main>
+				</div>
 			</div>
+			<!-- Mobile Sidebar -->
+			@components.MobileSidebar()
 			<!-- Theme Switcher Module -->
 			<script type="module" src={ resources.StaticPath("theme-switcher.js") }></script>
 		</body>
