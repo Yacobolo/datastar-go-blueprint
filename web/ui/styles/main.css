@@ -3,6 +3,8 @@
 
 /* Import all CSS files (esbuild will bundle and resolve) */
 @import './layers/base.css';
+@import './layers/components/app-shell.css';
+@import './layers/components/header.css';
 @import './layers/components/button.css';
 @import './layers/components/input.css';
 @import './layers/components/callout.css';

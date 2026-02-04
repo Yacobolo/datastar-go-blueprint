@@ -53,6 +53,10 @@ func build(ctx context.Context) error {
 				OutputPath: "libs/index",
 			},
 			{
+				InputPath:  "web/ui/src/plugins/theme-switcher.ts",
+				OutputPath: "theme-switcher",
+			},
+			{
 				InputPath:  "web/ui/styles/main.css",
 				OutputPath: "styles",
 			},

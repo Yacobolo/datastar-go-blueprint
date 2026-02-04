@@ -3,9 +3,14 @@ package layouts
 import (
 	ds "github.com/Yacobolo/datastar-templ"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+	"github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
 	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
 )
+
+// baseSignals returns the initial signals JSON for theme support
+func baseSignals() string {
+	return `{"theme": "system"}`
+}
 
 templ Base(title string) {
 	<!DOCTYPE html>
@@ -13,6 +18,15 @@ templ Base(title string) {
 		<head>
 			<title>{ title }</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+			<!-- Theme init script - runs before CSS to prevent flash -->
+			<script>
+				(function() {
+					var stored = localStorage.getItem('theme') || 'system';
+					var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					var resolved = stored === 'system' ? (prefersDark ? 'dark' : 'light') : stored;
+					document.documentElement.dataset.theme = resolved;
+				})();
+			</script>
 			<link rel="preconnect" href="https://fonts.googleapis.com"/>
 			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 			<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@100..900&family=Gideon+Roman:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet"/>
@@ -20,11 +34,19 @@ templ Base(title string) {
 			<link href={ resources.StaticPath("styles.css") } rel="stylesheet" type="text/css"/>
 			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
 		</head>
-		<body class={ ui.Flex, ui.FlexCol, ui.MinHScreen }>
+		<body { ds.SignalsJSON(baseSignals())... }>
 			if config.Global.Environment == config.Dev {
 				<div { ds.Init(ds.Get("/reload", ds.Opt("retryMaxCount", "1000"), ds.Opt("retryInterval", "20"), ds.Opt("retryMaxWaitMs", "200")))... }></div>
 			}
-			{ children... }
+			<!-- App Shell -->
+			<div class="app-shell">
+				@components.Header(title)
+				<main class="app-main">
+					{ children... }
+				</main>
+			</div>
+			<!-- Theme Switcher Module -->
+			<script type="module" src={ resources.StaticPath("theme-switcher.js") }></script>
 		</body>
 	</html>
 }

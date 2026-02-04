@@ -5,9 +5,9 @@
     padding: var(--ui-space-sm) var(--ui-space-md);
     font-size: var(--ui-type-size-base);
     line-height: var(--ui-leading-normal);
-    color: var(--ui-color-on-surface);
+    color: var(--ui-color-surface-on);
     background: var(--ui-color-surface);
-    border: var(--ui-border-md) solid var(--ui-color-outline);
+    border: var(--ui-border-default) solid var(--ui-color-outline-variant);
     border-radius: var(--ui-radius-md);
     transition: border-color var(--ui-duration-fast) var(--ui-ease-default);
 
@@ -17,12 +17,12 @@
     }
 
     &::placeholder {
-      color: var(--ui-color-on-surface-variant);
+      color: var(--ui-color-surface-variant-on);
       opacity: 0.6;
     }
   }
 
   .input-bordered {
-    border-width: var(--ui-border-lg);
+    border-width: var(--ui-border-thick);
   }
 }

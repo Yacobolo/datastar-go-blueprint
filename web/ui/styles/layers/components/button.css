@@ -8,7 +8,7 @@
     font-size: var(--ui-type-size-sm);
     font-weight: var(--ui-weight-medium);
     line-height: 1;
-    border: var(--ui-border-md) solid transparent;
+    border: var(--ui-border-default) solid transparent;
     border-radius: var(--ui-radius-md);
     cursor: pointer;
     transition: all var(--ui-duration-fast) var(--ui-ease-default);
@@ -23,37 +23,40 @@
 
   .btn-primary {
     background: var(--ui-color-primary);
-    color: var(--ui-color-on-primary);
+    color: var(--ui-color-primary-on);
     
     &:hover:not(:disabled) {
       background: var(--ui-color-primary-container);
+      color: var(--ui-color-primary-container-on);
     }
   }
 
   .btn-secondary {
     background: var(--ui-color-secondary);
-    color: var(--ui-color-on-secondary);
+    color: var(--ui-color-secondary-on);
     
     &:hover:not(:disabled) {
       background: var(--ui-color-secondary-container);
+      color: var(--ui-color-secondary-container-on);
     }
   }
 
   .btn-error {
     background: var(--ui-color-error);
-    color: var(--ui-color-on-error);
+    color: var(--ui-color-error-on);
     
     &:hover:not(:disabled) {
-      opacity: 0.9;
+      background: var(--ui-color-error-container);
+      color: var(--ui-color-error-container-on);
     }
   }
 
   .btn-ghost {
     background: transparent;
-    color: var(--ui-color-on-background);
+    color: var(--ui-color-surface-on);
     
     &:hover:not(:disabled) {
-      background: var(--ui-color-surface);
+      background: var(--ui-color-surface-container);
     }
   }
 

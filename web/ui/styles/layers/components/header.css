@@ -1,0 +1,95 @@
+/**
+ * Header Component
+ * Simple, neutral header with theme toggle
+ * 100% token-based styling for easy customization
+ */
+
+@layer components {
+  /* ========================================
+   * Header Container
+   * ======================================== */
+
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-md);
+    padding: var(--ui-space-sm) var(--ui-space-lg);
+    background: var(--ui-color-surface-container);
+    border-bottom: var(--ui-border-thin) solid var(--ui-color-outline-variant);
+    min-height: 60px;
+  }
+
+  /* ========================================
+   * Header Title
+   * ======================================== */
+
+  .header-title h1 {
+    font-size: var(--ui-type-size-lg);
+    font-weight: var(--ui-weight-semibold);
+    color: var(--ui-color-surface-on);
+    margin: 0;
+  }
+
+  /* ========================================
+   * Header Spacer
+   * ======================================== */
+
+  .header-spacer {
+    flex: 1;
+  }
+
+  /* ========================================
+   * Icon Buttons
+   * ======================================== */
+
+  .header-icon-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: var(--ui-radius-md);
+    color: var(--ui-color-surface-variant-on);
+    cursor: pointer;
+    transition: 
+      background var(--ui-duration-fast) var(--ui-ease-default),
+      color var(--ui-duration-fast) var(--ui-ease-default);
+  }
+
+  .header-icon-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .header-icon-btn:hover {
+    background: var(--ui-color-surface-container-high);
+    color: var(--ui-color-surface-on);
+  }
+
+  .header-icon-btn:focus-visible {
+    outline: 2px solid var(--ui-color-primary);
+    outline-offset: 2px;
+  }
+
+  .header-icon-btn:active {
+    background: var(--ui-color-surface-container-highest);
+  }
+
+  /* ========================================
+   * Mobile Responsive
+   * ======================================== */
+
+  @media (max-width: 768px) {
+    .app-header {
+      padding: var(--ui-space-sm) var(--ui-space-md);
+    }
+    
+    .header-title h1 {
+      font-size: var(--ui-type-size-base);
+    }
+  }
+}

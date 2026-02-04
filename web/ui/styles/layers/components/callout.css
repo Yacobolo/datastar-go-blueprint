@@ -5,23 +5,25 @@
     align-items: flex-start;
     padding: var(--ui-space-md);
     border-radius: var(--ui-radius-md);
-    background: var(--ui-color-surface);
-    border: 1px solid var(--ui-color-outline);
+    background: var(--ui-color-surface-container);
+    border: var(--ui-border-thin) solid var(--ui-color-outline-variant);
   }
 
   .callout-info {
-    background: var(--ui-color-surface);
-    border-color: var(--ui-color-outline);
+    background: var(--ui-color-surface-container);
+    border-color: var(--ui-color-outline-variant);
   }
 
   .callout-success {
     background: var(--ui-color-primary-container);
     border-color: var(--ui-color-primary);
+    color: var(--ui-color-primary-container-on);
   }
 
   .callout-error {
     background: var(--ui-color-error-container);
     border-color: var(--ui-color-error);
+    color: var(--ui-color-error-container-on);
   }
 
   .callout-content {

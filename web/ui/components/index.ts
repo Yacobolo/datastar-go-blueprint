@@ -1,3 +1,6 @@
+// Import theme switcher (auto-initializes)
+import '../src/plugins/theme-switcher';
+
 // Export all Lit components
 export { TodoTable } from './todo-table/todo-table';
 

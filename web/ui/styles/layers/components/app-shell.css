@@ -1,0 +1,115 @@
+/**
+ * App Shell Component
+ * Simple, neutral app shell layout with header and content area
+ * 100% token-based styling for easy customization
+ */
+
+@layer components {
+  /* ========================================
+   * App Shell - Simple Flexbox Layout
+   * ======================================== */
+
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--ui-color-surface);
+    color: var(--ui-color-surface-on);
+  }
+
+  /* ========================================
+   * Main Content Area
+   * ======================================== */
+
+  .app-main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--ui-color-surface);
+  }
+
+  /* ========================================
+   * Page Layout Utilities
+   * ======================================== */
+
+  .page {
+    padding: var(--ui-space-xl);
+    max-width: var(--container-xl);
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--ui-space-lg);
+    margin-block-end: var(--ui-space-lg);
+  }
+
+  .page-header__content {
+    flex: 1;
+  }
+
+  .page-header__content h1 {
+    font-size: var(--ui-type-size-2xl);
+    font-weight: var(--ui-weight-semibold);
+    color: var(--ui-color-surface-on);
+    margin-block-end: var(--ui-space-2xs);
+  }
+
+  .page-header__content p {
+    font-size: var(--ui-type-size-sm);
+    color: var(--ui-color-surface-variant-on);
+    line-height: var(--ui-leading-relaxed);
+  }
+
+  .page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-xs);
+    flex-shrink: 0;
+  }
+
+  /* ========================================
+   * Icon Styles (Global)
+   * ======================================== */
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .icon--sm {
+    width: 20px;
+    height: 20px;
+  }
+
+  .icon--lg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* ========================================
+   * Mobile Responsive
+   * ======================================== */
+
+  @media (max-width: 768px) {
+    .page {
+      padding: var(--ui-space-md);
+    }
+    
+    .page-header {
+      flex-direction: column;
+      gap: var(--ui-space-md);
+    }
+    
+    .page-header__actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+}
