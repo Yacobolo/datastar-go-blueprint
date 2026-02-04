@@ -1,22 +1,123 @@
 version: '3'
 
+env:
+  STATIC_DIR: web/resources/static
+
 tasks:
-  # ====================
-  # Development Commands
-  # ====================
-  
   default:
     desc: Show available tasks
     cmds:
       - task --list
 
-  dev:
-    desc: Start development server with live reload
-    aliases: [live, watch]
+  # ====================
+  # Build Tasks (Production)
+  # ====================
+
+  build:templ:
+    desc: Generate templ templates
+    aliases: [generate:templ]
+    sources:
+      - internal/features/**/*.templ
+    generates:
+      - internal/features/**/*_templ.go
+    cmds:
+      - templ generate
+
+  build:web:styles:
+    desc: Bundle CSS with esbuild (resolves @import statements)
+    sources:
+      - web/ui/styles/**/*.css
+    generates:
+      - web/resources/static/styles.css
+    cmds:
+      - go run cmd/server/build/main.go
+
+  build:web:bundle:
+    desc: Bundle JavaScript/TypeScript with esbuild
+    sources:
+      - web/ui/components/**/*.ts
+    generates:
+      - web/resources/static/libs/*.js
+    cmds:
+      - go run cmd/server/build/main.go
+
+  build:web:all:
+    desc: Build all web assets (CSS + JS)
     deps:
-      - generate:all
+      - build:web:styles
+
+  build:
+    desc: Build production binary
+    deps:
+      - generate:sqlc
+      - css:gen
+      - build:templ
+      - build:web:all
+    cmds:
+      - go build -o bin/server cmd/server/main.go
+
+  # ====================
+  # Live Tasks (Development with Watchers)
+  # ====================
+
+  live:templ:
+    desc: Watch and regenerate templ templates
+    cmds:
+      - templ generate -watch
+
+  live:web:styles:
+    desc: Watch and bundle CSS with esbuild
+    cmds:
+      - go run cmd/server/build/main.go -watch
+
+  live:web:bundle:
+    desc: Watch and bundle JavaScript with esbuild
+    cmds:
+      - go run cmd/server/build/main.go -watch
+
+  live:server:
+    desc: Run server with Air (hot reload)
     cmds:
       - air
+
+  live:
+    desc: Start all watchers (run in separate terminals or use tmux/tmuxinator)
+    cmds:
+      - echo "Development Mode - Run these in separate terminals:"
+      - echo "  1. task live:templ"
+      - echo "  2. task live:web:styles"
+      - echo "  3. task live:server"
+      - echo ""
+      - echo "Or use task dev (simplified, Air handles watchers)"
+
+  # ====================
+  # Development Commands
+  # ====================
+
+  dev:
+    desc: Start development server with live reload
+    aliases: [watch]
+    deps:
+      - generate:sqlc
+      - css:gen
+      - build:templ
+      - build:web:styles
+    cmds:
+      - air
+
+  # ====================
+  # Download External Assets
+  # ====================
+
+  # download:libs:
+  #   desc: Download external JavaScript libraries
+  #   sources:
+  #     - cmd/server/downloader/main.go
+  #   generates:
+  #     - web/resources/static/datastar/datastar.js
+  #   cmds:
+  #     - go run cmd/server/downloader/main.go
+  # Note: Commented out - project uses CDN for Datastar (see base.templ)
 
   # ====================
   # Code Generation
@@ -27,7 +128,7 @@ tasks:
     deps:
       - generate:sqlc
       - css:gen
-      - generate:templ
+      - build:templ
 
   generate:sqlc:
     desc: Generate type-safe database code from SQL
@@ -39,20 +140,6 @@ tasks:
     cmds:
       - sqlc generate
 
-  generate:templ:
-    desc: Generate Go code from templ templates
-    aliases: [build:templ]
-    sources:
-      - features/**/*.templ
-    generates:
-      - features/**/*_templ.go
-    cmds:
-      - templ generate
-
-  # ====================
-  # CSS Generation & Linting
-  # ====================
-
   css:gen:
     desc: Generate type-safe CSS constants from CSS files
     sources:
@@ -61,6 +148,10 @@ tasks:
       - internal/ui/styles*.gen.go
     cmds:
       - cssgen -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css"
+
+  # ====================
+  # CSS Linting
+  # ====================
 
   css:lint:
     desc: Lint CSS usage (golangci-lint style - issues only)
@@ -82,43 +173,6 @@ tasks:
     cmds:
       - cssgen -lint-only -output-format markdown -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go" > css-report.md
       - echo "Report saved to css-report.md"
-
-  # ====================
-  # Build Commands
-  # ====================
-
-  build:all:
-    desc: Build production binary
-    deps:
-      - generate:all
-      - build:web:all
-    cmds:
-      - go build -o bin/server cmd/server/main.go
-
-  build:web:all:
-    desc: Build all web assets
-    deps:
-      - build:web:styles
-      - build:web:bundle
-
-  build:web:styles:
-    desc: Bundle CSS with design tokens
-    sources:
-      - web/ui/styles/**/*.css
-    generates:
-      - web/resources/static/styles.css
-    cmds:
-      - mkdir -p web/resources/static
-      - cp web/ui/styles/main.css web/resources/static/styles.css
-
-  build:web:bundle:
-    desc: Bundle JavaScript/TypeScript with esbuild
-    sources:
-      - web/ui/components/**/*.ts
-    generates:
-      - web/resources/static/libs/*.js
-    cmds:
-      - go run cmd/server/build/main.go
 
   # ====================
   # Database Commands

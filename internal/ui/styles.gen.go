@@ -3,7 +3,7 @@
 // Source: web/ui/styles
 // Files scanned: 7
 // Classes generated: 99
-// Generated: 2026-02-03 21:52:58
+// Generated: 2026-02-04 08:17:31
 //
 // This file provides type-safe constants for CSS classes.
 // Each constant includes metadata about layer, inheritance, and styles.

@@ -1,10 +1,7 @@
-/* Import design tokens */
+/* Import design tokens first */
 @import url('./layers/tokens/index.css');
 
-/* Define layer order */
-@layer base, components, utilities;
-
-/* Import layers */
+/* Import all CSS files (esbuild will bundle and resolve) */
 @import './layers/base.css';
 @import './layers/components/button.css';
 @import './layers/components/input.css';
@@ -12,3 +9,6 @@
 @import './layers/components/loading.css';
 @import './layers/components/todo.css';
 @import './layers/utilities.css';
+
+/* Define layer order (must come after @import rules) */
+@layer base, components, utilities;

@@ -52,6 +52,10 @@ func build(ctx context.Context) error {
 				InputPath:  resources.LibsDirectoryPath + "/index.ts",
 				OutputPath: "libs/index",
 			},
+			{
+				InputPath:  "web/ui/styles/main.css",
+				OutputPath: "styles",
+			},
 		},
 		Bundle:            true,
 		Format:            api.FormatESModule,
