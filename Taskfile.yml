@@ -2,6 +2,12 @@ version: '3'
 
 env:
   STATIC_DIR: web/resources/static
+  # cssgen common parameters
+  CSSGEN_SOURCE: web/ui/styles
+  CSSGEN_OUTPUT_DIR: internal/ui
+  CSSGEN_PACKAGE: ui
+  CSSGEN_INCLUDE: "layers/components/**/*.css,layers/utilities.css,layers/base.css"
+  CSSGEN_LINT_PATHS: "internal/features/**/*.templ,internal/features/**/*.go"
 
 tasks:
   default:
@@ -10,12 +16,16 @@ tasks:
       - task --list
 
   # ====================
-  # Build Tasks (Production)
+  # Code Generation (generate:*)
+  # ====================
+  # These tasks generate Go code from source files:
+  # - generate:templ : *.templ → *_templ.go
+  # - generate:sqlc  : *.sql → type-safe queries
+  # - generate:css   : *.css → type-safe constants
   # ====================
 
-  build:templ:
+  generate:templ:
     desc: Generate templ templates
-    aliases: [generate:templ]
     sources:
       - internal/features/**/*.templ
     generates:
@@ -23,36 +33,40 @@ tasks:
     cmds:
       - templ generate
 
-  build:web:styles:
-    desc: Bundle CSS with esbuild (resolves @import statements)
+  # ====================
+  # Asset Bundling (build:web:*)
+  # ====================
+  # These tasks bundle frontend assets for deployment
+  # ====================
+
+  build:web:assets:
+    desc: Bundle all web assets (CSS + JS/TS) with esbuild
     sources:
       - web/ui/styles/**/*.css
+      - web/ui/components/**/*.ts
+      - web/ui/libs/**/*.ts
+      - web/ui/src/**/*.ts
     generates:
       - web/resources/static/styles.css
-    cmds:
-      - go run cmd/server/build/main.go
-
-  build:web:bundle:
-    desc: Bundle JavaScript/TypeScript with esbuild
-    sources:
-      - web/ui/components/**/*.ts
-    generates:
       - web/resources/static/libs/*.js
+      - web/resources/static/theme-switcher.js
     cmds:
       - go run cmd/server/build/main.go
 
-  build:web:all:
-    desc: Build all web assets (CSS + JS)
+  build:web:
+    desc: Build all web assets
     deps:
-      - build:web:styles
+      - build:web:assets
+
+  # ====================
+  # Production Build
+  # ====================
 
   build:
     desc: Build production binary
     deps:
-      - generate:sqlc
-      - css:gen
-      - build:templ
-      - build:web:all
+      - generate:all
+      - build:web
     cmds:
       - go build -o bin/server cmd/server/main.go
 
@@ -65,13 +79,8 @@ tasks:
     cmds:
       - templ generate -watch
 
-  live:web:styles:
-    desc: Watch and bundle CSS with esbuild
-    cmds:
-      - go run cmd/server/build/main.go -watch
-
-  live:web:bundle:
-    desc: Watch and bundle JavaScript with esbuild
+  live:web:assets:
+    desc: Watch and bundle all web assets (CSS + JS/TS) with esbuild
     cmds:
       - go run cmd/server/build/main.go -watch
 
@@ -85,7 +94,7 @@ tasks:
     cmds:
       - echo "Development Mode - Run these in separate terminals:"
       - echo "  1. task live:templ"
-      - echo "  2. task live:web:styles"
+      - echo "  2. task live:web:assets"
       - echo "  3. task live:server"
       - echo ""
       - echo "Or use task dev (simplified, Air handles watchers)"
@@ -98,10 +107,8 @@ tasks:
     desc: Start development server with live reload
     aliases: [watch]
     deps:
-      - generate:sqlc
-      - css:gen
-      - build:templ
-      - build:web:styles
+      - generate:all
+      - build:web:assets
     cmds:
       - air
 
@@ -120,15 +127,15 @@ tasks:
   # Note: Commented out - project uses CDN for Datastar (see base.templ)
 
   # ====================
-  # Code Generation
+  # Code Generation - Meta Task
   # ====================
 
   generate:all:
-    desc: Run all code generators
+    desc: Run all code generators (sqlc, cssgen, templ)
     deps:
       - generate:sqlc
-      - css:gen
-      - build:templ
+      - generate:css
+      - generate:templ
 
   generate:sqlc:
     desc: Generate type-safe database code from SQL
@@ -140,14 +147,14 @@ tasks:
     cmds:
       - sqlc generate
 
-  css:gen:
+  generate:css:
     desc: Generate type-safe CSS constants from CSS files
     sources:
       - web/ui/styles/**/*.css
     generates:
       - internal/ui/styles*.gen.go
     cmds:
-      - cssgen -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css"
+      - cssgen -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}"
 
   # ====================
   # CSS Linting
@@ -156,22 +163,22 @@ tasks:
   css:lint:
     desc: Lint CSS usage (golangci-lint style - issues only)
     cmds:
-      - cssgen -lint-only -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go"
+      - cssgen -lint-only -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
 
   css:lint:full:
     desc: Lint with statistics and Quick Wins (planning refactors)
     cmds:
-      - cssgen -lint-only -output-format full -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go"
+      - cssgen -lint-only -output-format full -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
 
   css:report:
     desc: Generate CSS adoption report (statistics only, no issues)
     cmds:
-      - cssgen -lint-only -output-format summary -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go"
+      - cssgen -lint-only -output-format summary -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
 
   css:report:md:
     desc: Export CSS report to Markdown (for GitHub issues, wikis)
     cmds:
-      - cssgen -lint-only -output-format markdown -source web/ui/styles -output-dir internal/ui -package ui -include "layers/components/**/*.css,layers/utilities.css,layers/base.css" -lint-paths "internal/features/**/*.templ,internal/features/**/*.go" > css-report.md
+      - cssgen -lint-only -output-format markdown -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}" > css-report.md
       - echo "Report saved to css-report.md"
 
   # ====================
