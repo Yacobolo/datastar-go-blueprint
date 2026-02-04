@@ -75,7 +75,7 @@ func (q *Queries) DeleteTodo(ctx context.Context, id string) error {
 }
 
 const getSession = `-- name: GetSession :one
-SELECT id, data, created_at, updated_at FROM sessions WHERE id = ?
+SELECT id, data, created_at, updated_at, mode, editing_idx FROM sessions WHERE id = ?
 `
 
 // Session queries
@@ -87,6 +87,8 @@ func (q *Queries) GetSession(ctx context.Context, id string) (Session, error) {
 		&i.Data,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Mode,
+		&i.EditingIdx,
 	)
 	return i, err
 }
@@ -175,19 +177,28 @@ func (q *Queries) UpdateTodoTask(ctx context.Context, arg UpdateTodoTaskParams) 
 }
 
 const upsertSession = `-- name: UpsertSession :exec
-INSERT INTO sessions (id, data, updated_at)
-VALUES (?, ?, CURRENT_TIMESTAMP)
+INSERT INTO sessions (id, data, mode, editing_idx, updated_at)
+VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
 ON CONFLICT(id) DO UPDATE SET
     data = excluded.data,
+    mode = excluded.mode,
+    editing_idx = excluded.editing_idx,
     updated_at = CURRENT_TIMESTAMP
 `
 
 type UpsertSessionParams struct {
-	ID   string `json:"id"`
-	Data string `json:"data"`
+	ID         string        `json:"id"`
+	Data       string        `json:"data"`
+	Mode       sql.NullInt64 `json:"mode"`
+	EditingIdx sql.NullInt64 `json:"editing_idx"`
 }
 
 func (q *Queries) UpsertSession(ctx context.Context, arg UpsertSessionParams) error {
-	_, err := q.db.ExecContext(ctx, upsertSession, arg.ID, arg.Data)
+	_, err := q.db.ExecContext(ctx, upsertSession,
+		arg.ID,
+		arg.Data,
+		arg.Mode,
+		arg.EditingIdx,
+	)
 	return err
 }

@@ -40,10 +40,12 @@ WHERE user_id = ?;
 SELECT * FROM sessions WHERE id = ?;
 
 -- name: UpsertSession :exec
-INSERT INTO sessions (id, data, updated_at)
-VALUES (?, ?, CURRENT_TIMESTAMP)
+INSERT INTO sessions (id, data, mode, editing_idx, updated_at)
+VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
 ON CONFLICT(id) DO UPDATE SET
     data = excluded.data,
+    mode = excluded.mode,
+    editing_idx = excluded.editing_idx,
     updated_at = CURRENT_TIMESTAMP;
 
 -- name: DeleteSession :exec

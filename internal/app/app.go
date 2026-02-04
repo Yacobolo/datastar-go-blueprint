@@ -98,7 +98,7 @@ func New(cfg *config.Config) (*App, error) {
 	// 6. Create services (application layer)
 	// Services depend on domain interfaces, not concrete implementations
 	svc := &Services{
-		Todo: services.NewTodoService(repos.Todos, sessionStore),
+		Todo: services.NewTodoService(repos.Todos, repos.Sessions, sessionStore),
 	}
 
 	return &App{

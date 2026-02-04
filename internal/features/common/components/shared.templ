@@ -22,5 +22,5 @@ templ Icon(icon string, attrs ...string) {
 }
 
 templ SseIndicator(signalName string) {
-	<div class={ ui.LoadingDots, ui.TextPrimary } { ds.Class(ds.Pair(ui.Loading + " " + ui.MlMd, fmt.Sprintf("$%s", signalName)))... }></div>
+	<div class={ ui.TextPrimary } { ds.Class(ds.Pair(ui.Loading + " " + ui.LoadingDots + " " + ui.MlMd, fmt.Sprintf("$%s", signalName)))... }></div>
 }

@@ -9,10 +9,12 @@ import (
 )
 
 type Session struct {
-	ID        string       `json:"id"`
-	Data      string       `json:"data"`
-	CreatedAt sql.NullTime `json:"created_at"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
+	ID         string        `json:"id"`
+	Data       string        `json:"data"`
+	CreatedAt  sql.NullTime  `json:"created_at"`
+	UpdatedAt  sql.NullTime  `json:"updated_at"`
+	Mode       sql.NullInt64 `json:"mode"`
+	EditingIdx sql.NullInt64 `json:"editing_idx"`
 }
 
 type Todo struct {

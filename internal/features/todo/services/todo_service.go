@@ -16,14 +16,16 @@ import (
 )
 
 type TodoService struct {
-	todoRepo domain.TodoRepository
-	store    sessions.Store
+	todoRepo    domain.TodoRepository
+	sessionRepo domain.SessionRepository
+	store       sessions.Store
 }
 
-func NewTodoService(todoRepo domain.TodoRepository, store sessions.Store) *TodoService {
+func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRepository, store sessions.Store) *TodoService {
 	return &TodoService{
-		todoRepo: todoRepo,
-		store:    store,
+		todoRepo:    todoRepo,
+		sessionRepo: sessionRepo,
+		store:       store,
 	}
 }
 
@@ -51,9 +53,24 @@ func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (
 		return nil, fmt.Errorf("failed to get todos: %w", err)
 	}
 
+	// Get session to load UI state
+	session, err := s.sessionRepo.GetSession(ctx, sessionID)
+	mode := todocomponents.TodoViewModeAll
+	editingIdx := -1
+
+	if err == nil {
+		// Session exists, load UI state
+		if session.Mode.Valid {
+			mode = todocomponents.TodoViewMode(session.Mode.Int64)
+		}
+		if session.EditingIdx.Valid {
+			editingIdx = int(session.EditingIdx.Int64)
+		}
+	}
+
 	mvc := &todocomponents.TodoMVC{
-		Mode:       todocomponents.TodoViewModeAll,
-		EditingIdx: -1,
+		Mode:       mode,
+		EditingIdx: editingIdx,
 	}
 
 	// Convert database todos to component todos
@@ -159,6 +176,16 @@ func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *to
 		}); err != nil {
 			return fmt.Errorf("failed to create todo: %w", err)
 		}
+	}
+
+	// Save UI state to session
+	if err := s.sessionRepo.UpsertSession(ctx, queries.UpsertSessionParams{
+		ID:         sessionID,
+		Data:       "",
+		Mode:       sql.NullInt64{Int64: int64(mvc.Mode), Valid: true},
+		EditingIdx: sql.NullInt64{Int64: int64(mvc.EditingIdx), Valid: true},
+	}); err != nil {
+		return fmt.Errorf("failed to save session state: %w", err)
 	}
 
 	return nil
