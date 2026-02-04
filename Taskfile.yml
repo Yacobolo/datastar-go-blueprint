@@ -1,6 +1,7 @@
-version: '3'
+version: "3"
 
 env:
+  PORT: 8080  # Default to 8080 to avoid macOS ControlCenter conflict on port 5000
   STATIC_DIR: web/resources/static
   # cssgen common parameters
   CSSGEN_SOURCE: web/ui/styles
@@ -53,11 +54,6 @@ tasks:
     cmds:
       - go run cmd/server/build/main.go
 
-  build:web:
-    desc: Build all web assets
-    deps:
-      - build:web:assets
-
   # ====================
   # Production Build
   # ====================
@@ -66,68 +62,35 @@ tasks:
     desc: Build production binary
     deps:
       - generate:all
-      - build:web
+      - build:web:assets
     cmds:
       - go build -o bin/server cmd/server/main.go
-
-  # ====================
-  # Live Tasks (Development with Watchers)
-  # ====================
-
-  live:templ:
-    desc: Watch and regenerate templ templates
-    cmds:
-      - templ generate -watch
-
-  live:web:assets:
-    desc: Watch and bundle all web assets (CSS + JS/TS) with esbuild
-    cmds:
-      - go run cmd/server/build/main.go -watch
-
-  live:server:
-    desc: Run server with Air (hot reload)
-    cmds:
-      - air
-
-  live:
-    desc: Start all watchers (run in separate terminals or use tmux/tmuxinator)
-    cmds:
-      - echo "Development Mode - Run these in separate terminals:"
-      - echo "  1. task live:templ"
-      - echo "  2. task live:web:assets"
-      - echo "  3. task live:server"
-      - echo ""
-      - echo "Or use task dev (simplified, Air handles watchers)"
 
   # ====================
   # Development Commands
   # ====================
 
   dev:
-    desc: Start development server with live reload
-    aliases: [watch]
+    desc: Start development with Procfile (all watchers in parallel)
     deps:
       - generate:all
       - build:web:assets
     cmds:
-      - air
+      - hivemind Procfile.dev
+
+  dev:stop:
+    desc: Stop running development processes
+    cmds:
+      - pkill -f "hivemind Procfile.dev" || true
+
+  dev:restart:
+    desc: Restart development processes
+    cmds:
+      - task: dev:stop
+      - task: dev
 
   # ====================
-  # Download External Assets
-  # ====================
-
-  # download:libs:
-  #   desc: Download external JavaScript libraries
-  #   sources:
-  #     - cmd/server/downloader/main.go
-  #   generates:
-  #     - web/resources/static/datastar/datastar.js
-  #   cmds:
-  #     - go run cmd/server/downloader/main.go
-  # Note: Commented out - project uses CDN for Datastar (see base.templ)
-
-  # ====================
-  # Code Generation - Meta Task
+  # Code Generation - Combined
   # ====================
 
   generate:all:
@@ -164,22 +127,6 @@ tasks:
     desc: Lint CSS usage (golangci-lint style - issues only)
     cmds:
       - cssgen -lint-only -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
-
-  css:lint:full:
-    desc: Lint with statistics and Quick Wins (planning refactors)
-    cmds:
-      - cssgen -lint-only -output-format full -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
-
-  css:report:
-    desc: Generate CSS adoption report (statistics only, no issues)
-    cmds:
-      - cssgen -lint-only -output-format summary -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
-
-  css:report:md:
-    desc: Export CSS report to Markdown (for GitHub issues, wikis)
-    cmds:
-      - cssgen -lint-only -output-format markdown -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}" > css-report.md
-      - echo "Report saved to css-report.md"
 
   # ====================
   # Database Commands
@@ -244,12 +191,13 @@ tasks:
       - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
       - go install github.com/yacobolo/cssgen/cmd/cssgen@latest
+      - go install github.com/DarthSim/hivemind@latest
 
   tools:check:
     desc: Check if required tools are installed
     cmds:
       - |
-        for tool in templ air sqlc golangci-lint cssgen; do
+        for tool in templ air sqlc golangci-lint cssgen hivemind; do
           if command -v $tool &> /dev/null; then
             echo "✓ $tool installed"
           else

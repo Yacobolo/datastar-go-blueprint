@@ -1,0 +1,5 @@
+# Procfile.dev - Run all development processes in parallel
+# Usage: hivemind Procfile.dev
+server: air -c .air.toml
+templ: templ generate -watch
+assets: go run cmd/server/build/main.go -watch

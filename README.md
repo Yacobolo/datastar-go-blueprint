@@ -39,6 +39,8 @@ git clone https://github.com/yacobolo/datastar-go-starter-kit.git
 cd datastar-go-starter-kit
 ```
 
+**Note for macOS users:** Port 5000 is used by macOS AirPlay Receiver (ControlCenter). This starter kit defaults to port 8080. You can customize the port by creating a `.env` file (see `.env.example`).
+
 2. Install Dependencies
 
 ```shell
@@ -75,14 +77,37 @@ go tool task live
 Live reload is set up out of the box, powered by:
 
 - [Air](https://github.com/air-verse/air) - Go hot reload
-- [esbuild](cmd/web/build/main.go) - TypeScript/JavaScript bundling
+- [esbuild](cmd/server/build/main.go) - TypeScript/JavaScript bundling
 - [templ](https://templ.guide/) - Template hot reload
+- [Hivemind](https://github.com/DarthSim/hivemind) - Process manager (optional, recommended)
 
-Use the [live task](./Taskfile.yml) from the [Taskfile](https://taskfile.dev/) to start with live reload:
+### Quick Start
+
+Start all development processes in parallel:
 
 ```shell
-go tool task live
+task dev
+# or directly:
+hivemind Procfile.dev
 ```
+
+This starts three parallel processes with better visibility:
+- `server` - Air (Go hot reload)
+- `templ` - Templ watcher (template hot reload)
+- `assets` - esbuild watcher (CSS/JS bundling)
+
+Each process only rebuilds what changed, making development fast and efficient.
+
+**Requirements:** Install hivemind first:
+```shell
+task tools:install  # Installs all tools including hivemind
+# or manually:
+go install github.com/DarthSim/hivemind@latest
+```
+
+**Controls:**
+- Stop: `Ctrl+C` or `task dev:stop`
+- Restart: `task dev:restart`
 
 Navigate to [`http://localhost:8080`](http://localhost:8080) in your browser.
 
@@ -90,16 +115,25 @@ Navigate to [`http://localhost:8080`](http://localhost:8080) in your browser.
 
 ```shell
 # Development
-go tool task live           # Start with hot reload
-go tool task debug          # Start with debugger attached
-
-# Building
-go tool task build          # Production build
-go tool task build:templ    # Generate Go from .templ files
-go tool task build:web:bundle # Bundle TypeScript components
+task dev                   # Start all watchers with Procfile
+task dev:stop              # Stop running development processes
+task dev:restart           # Restart development processes
 
 # Code Generation
-sqlc generate               # Generate type-safe database code
+task generate:all          # Run all code generators
+task generate:templ        # Generate Go from .templ files
+task generate:css          # Generate type-safe CSS constants
+task generate:sqlc         # Generate type-safe database code
+
+# Building
+task build                 # Production build
+task build:web:assets      # Bundle CSS + JS/TS
+
+# Testing & Linting
+task check                 # Run tests, lint, and CSS lint
+task test                  # Run tests
+task lint                  # Run Go linters
+task css:lint              # Lint CSS usage
 ```
 
 ## Project Structure
