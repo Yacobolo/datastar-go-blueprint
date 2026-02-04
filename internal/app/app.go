@@ -3,9 +3,16 @@
 package app
 
 import (
+	"fmt"
+	"log/slog"
+	"net/http"
+	"time"
+
 	"github.com/gorilla/sessions"
+	embeddednats "github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
 
+	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/domain"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/store"
@@ -28,35 +35,80 @@ type App struct {
 	Store        *store.SQLiteStore
 	SessionStore sessions.Store
 	NATS         *nats.Conn
+	NATSServer   *embeddednats.Server
 	Repositories *Repositories
 	Services     *Services
 }
 
 // New creates a new App instance with all dependencies wired up.
-// This follows the dependency injection pattern where:
-// 1. Infrastructure (Store, NATS, SessionStore) is passed in
-// 2. Repositories are created from the Store
-// 3. Services are created with repository dependencies
-func New(st *store.SQLiteStore, sessionStore sessions.Store, nc *nats.Conn) *App {
-	// Create repositories (driven adapters)
-	repos := &Repositories{
-		Todos:    store.NewTodoRepository(st),
-		Sessions: store.NewSessionRepository(st),
+// This function initializes all infrastructure components (SessionStore, NATS, Database)
+// and wires up the application following hexagonal architecture:
+// 1. Initialize infrastructure (SessionStore, NATS server, NATS client, Database)
+// 2. Create repositories (driven adapters) from the Store
+// 3. Create services (application layer) with repository dependencies
+func New(cfg *config.Config) (*App, error) {
+	// 1. Create SessionStore
+	sessionStore := sessions.NewCookieStore([]byte(cfg.SessionSecret))
+	sessionStore.MaxAge(86400 * 30) // 30 days
+	sessionStore.Options.Path = "/"
+	sessionStore.Options.HttpOnly = true
+	sessionStore.Options.Secure = false
+	sessionStore.Options.SameSite = http.SameSiteLaxMode
+
+	// 2. Start embedded NATS server
+	natsOpts := &embeddednats.Options{
+		Host:      "localhost",
+		Port:      4222,
+		JetStream: true,
+	}
+	ns, err := embeddednats.NewServer(natsOpts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start NATS: %w", err)
+	}
+	go ns.Start()
+	if !ns.ReadyForConnections(4 * time.Second) {
+		return nil, fmt.Errorf("NATS not ready")
 	}
 
-	// Create services (application layer)
+	slog.Info("NATS server started", "url", ns.ClientURL())
+
+	// 3. Connect to NATS
+	nc, err := nats.Connect(ns.ClientURL())
+	if err != nil {
+		ns.Shutdown()
+		return nil, fmt.Errorf("failed to connect to NATS: %w", err)
+	}
+
+	// 4. Open database
+	dbStore, err := store.Open(cfg.DBPath)
+	if err != nil {
+		nc.Close()
+		ns.Shutdown()
+		return nil, fmt.Errorf("failed to open database: %w", err)
+	}
+
+	slog.Info("database initialized", "path", cfg.DBPath)
+
+	// 5. Create repositories (driven adapters)
+	repos := &Repositories{
+		Todos:    store.NewTodoRepository(dbStore),
+		Sessions: store.NewSessionRepository(dbStore),
+	}
+
+	// 6. Create services (application layer)
 	// Services depend on domain interfaces, not concrete implementations
 	svc := &Services{
 		Todo: services.NewTodoService(repos.Todos, sessionStore),
 	}
 
 	return &App{
-		Store:        st,
+		Store:        dbStore,
 		SessionStore: sessionStore,
 		NATS:         nc,
+		NATSServer:   ns,
 		Repositories: repos,
 		Services:     svc,
-	}
+	}, nil
 }
 
 // Close closes all resources held by the application.
@@ -64,6 +116,9 @@ func New(st *store.SQLiteStore, sessionStore sessions.Store, nc *nats.Conn) *App
 func (a *App) Close() error {
 	if a.NATS != nil {
 		a.NATS.Close()
+	}
+	if a.NATSServer != nil {
+		a.NATSServer.Shutdown()
 	}
 	if a.Store != nil {
 		return a.Store.Close()

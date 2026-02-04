@@ -14,13 +14,9 @@ import (
 	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
 	"github.com/yacobolo/datastar-go-starter-kit/internal/platform/router"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/store"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/gorilla/sessions"
-	embeddednats "github.com/nats-io/nats-server/v2/server"
-	"github.com/nats-io/nats.go"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -54,49 +50,11 @@ func run(ctx context.Context) error {
 		middleware.Recoverer,
 	)
 
-	sessionStore := sessions.NewCookieStore([]byte(config.Global.SessionSecret))
-	sessionStore.MaxAge(86400 * 30)
-	sessionStore.Options.Path = "/"
-	sessionStore.Options.HttpOnly = true
-	sessionStore.Options.Secure = false
-	sessionStore.Options.SameSite = http.SameSiteLaxMode
-
-	// Start embedded NATS server
-	natsOpts := &embeddednats.Options{
-		Host:      "localhost",
-		Port:      4222,
-		JetStream: true,
-	}
-	ns, err := embeddednats.NewServer(natsOpts)
-	if err != nil {
-		return fmt.Errorf("failed to start NATS: %w", err)
-	}
-	go ns.Start()
-	if !ns.ReadyForConnections(4 * time.Second) {
-		return fmt.Errorf("NATS not ready")
-	}
-	defer ns.Shutdown()
-
-	slog.Info("NATS server started", "url", ns.ClientURL())
-
-	// Connect to NATS
-	nc, err := nats.Connect(ns.ClientURL())
-	if err != nil {
-		return fmt.Errorf("failed to connect to NATS: %w", err)
-	}
-	defer nc.Close()
-
-	// Initialize database with new store package
-	dbStore, err := store.Open(config.Global.DBPath)
-	if err != nil {
-		return fmt.Errorf("failed to open database: %w", err)
-	}
-	defer dbStore.Close()
-
-	slog.Info("database initialized", "path", config.Global.DBPath)
-
 	// Wire up application dependencies
-	application := app.New(dbStore, sessionStore, nc)
+	application, err := app.New(config.Global)
+	if err != nil {
+		return fmt.Errorf("failed to initialize app: %w", err)
+	}
 	defer application.Close()
 
 	// Setup routes with App container
