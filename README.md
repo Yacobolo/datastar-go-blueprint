@@ -1,6 +1,18 @@
-# Datastar Go Blueprint
+<h1 align="center">Datastar Go Blueprint</h1>
 
-A modern, opinionated blueprint for building reactive web applications.
+<p align="center">
+  <strong>A modern, opinionated blueprint for building reactive web applications.</strong>
+  <br>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT">
+  </a>
+</p>
+
+<p align="center">
+  <img src="mascot.png" alt="Datastar Go Blueprint mascot" width="600">
+</p>
+
+---
 
 ## The Stack
 
