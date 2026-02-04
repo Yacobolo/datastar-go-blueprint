@@ -7,27 +7,71 @@
     padding: var(--ui-space-sm) var(--ui-space-md);
     font-size: var(--ui-type-size-sm);
     font-weight: var(--ui-weight-medium);
-    line-height: 1;
+    line-height: var(--ui-leading-snug);
     border: var(--ui-border-default) solid transparent;
     border-radius: var(--ui-radius-md);
     cursor: pointer;
-    transition: all var(--ui-duration-fast) var(--ui-ease-default);
+    transition: 
+      background-color var(--ui-duration-fast) var(--ui-ease-default),
+      color var(--ui-duration-fast) var(--ui-ease-default),
+      border-color var(--ui-duration-fast) var(--ui-ease-default),
+      transform var(--ui-duration-fast) var(--ui-ease-default),
+      box-shadow var(--ui-duration-fast) var(--ui-ease-default);
     user-select: none;
     white-space: nowrap;
+    position: relative;
+
+    &:focus-visible {
+      outline: 2px solid var(--ui-color-primary);
+      outline-offset: 2px;
+      box-shadow: var(--ui-focus-ring);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(1px);
+    }
 
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    &[aria-busy="true"] {
+      color: transparent;
+      pointer-events: none;
     }
   }
 
   .btn-primary {
     background: var(--ui-color-primary);
     color: var(--ui-color-primary-on);
+    box-shadow: var(--ui-shadow-sm);
     
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--ui-duration-fast);
+      pointer-events: none;
+    }
+
+    &:hover:not(:disabled)::before {
+      opacity: var(--ui-state-hover-opacity);
+    }
+
+    &:focus-visible::before {
+      opacity: var(--ui-state-focus-opacity);
+    }
+
+    &:active:not(:disabled)::before {
+      opacity: var(--ui-state-pressed-opacity);
+    }
+
     &:hover:not(:disabled) {
-      background: var(--ui-color-primary-container);
-      color: var(--ui-color-primary-container-on);
+      box-shadow: var(--ui-shadow-md);
     }
   }
 
@@ -35,9 +79,27 @@
     background: var(--ui-color-secondary);
     color: var(--ui-color-secondary-on);
     
-    &:hover:not(:disabled) {
-      background: var(--ui-color-secondary-container);
-      color: var(--ui-color-secondary-container-on);
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--ui-duration-fast);
+      pointer-events: none;
+    }
+
+    &:hover:not(:disabled)::before {
+      opacity: var(--ui-state-hover-opacity);
+    }
+
+    &:focus-visible::before {
+      opacity: var(--ui-state-focus-opacity);
+    }
+
+    &:active:not(:disabled)::before {
+      opacity: var(--ui-state-pressed-opacity);
     }
   }
 
@@ -45,9 +107,27 @@
     background: var(--ui-color-error);
     color: var(--ui-color-error-on);
     
-    &:hover:not(:disabled) {
-      background: var(--ui-color-error-container);
-      color: var(--ui-color-error-container-on);
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--ui-duration-fast);
+      pointer-events: none;
+    }
+
+    &:hover:not(:disabled)::before {
+      opacity: var(--ui-state-hover-opacity);
+    }
+
+    &:focus-visible::before {
+      opacity: var(--ui-state-focus-opacity);
+    }
+
+    &:active:not(:disabled)::before {
+      opacity: var(--ui-state-pressed-opacity);
     }
   }
 
@@ -55,14 +135,34 @@
     background: transparent;
     color: var(--ui-color-surface-on);
     
-    &:hover:not(:disabled) {
-      background: var(--ui-color-surface-container);
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: var(--ui-color-surface-on);
+      opacity: 0;
+      transition: opacity var(--ui-duration-fast);
+      pointer-events: none;
+    }
+
+    &:hover:not(:disabled)::before {
+      opacity: var(--ui-state-hover-opacity);
+    }
+
+    &:focus-visible::before {
+      opacity: var(--ui-state-focus-opacity);
+    }
+
+    &:active:not(:disabled)::before {
+      opacity: var(--ui-state-pressed-opacity);
     }
   }
 
   .btn-sm {
     padding: var(--ui-space-xs) var(--ui-space-sm);
     font-size: var(--ui-type-size-xs);
+    min-height: 36px;
   }
 
   .btn-lg {

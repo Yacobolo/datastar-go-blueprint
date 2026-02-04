@@ -170,8 +170,12 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 			<label
 				id={ fmt.Sprintf("toggle%d", i) }
 				class={ ui.TodoCheckboxLabel }
+				tabindex="0"
+				role="checkbox"
+				aria-checked={ fmt.Sprintf("%t", todo.Completed) }
 				{ ds.Merge(
 					ds.OnClick(ds.Post("/api/todos/%d/toggle", i)),
+					ds.OnKeyDown(fmt.Sprintf("if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); %s }", ds.Post("/api/todos/%d/toggle", i))),
 					ds.Indicator(fetchingSignalName),
 				)... }
 			>
@@ -184,8 +188,10 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 			<label
 				id={ indicatorID }
 				class={ ui.TodoTextLabel }
+				tabindex="0"
 				{ ds.Merge(
 					ds.OnClick(ds.Get("/api/todos/%d/edit", i)),
+					ds.OnKeyDown(fmt.Sprintf("if (evt.key === 'Enter') { evt.preventDefault(); %s }", ds.Get("/api/todos/%d/edit", i))),
 					ds.Indicator(fetchingSignalName),
 				)... }
 			>

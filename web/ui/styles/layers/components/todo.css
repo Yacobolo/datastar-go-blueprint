@@ -72,7 +72,7 @@
   /* === Todo List === */
   
   .todo-list-container {
-    max-height: calc(100vh - 400px);
+    max-height: 60vh;
     overflow: auto;
   }
 
@@ -95,16 +95,19 @@
     border-radius: var(--ui-radius-md);
     transition: 
       background var(--ui-duration-fast) var(--ui-ease-default),
-      border-color var(--ui-duration-fast) var(--ui-ease-default);
+      border-color var(--ui-duration-fast) var(--ui-ease-default),
+      box-shadow var(--ui-duration-fast) var(--ui-ease-default),
+      opacity var(--ui-duration-normal) var(--ui-ease-default);
   }
 
   .todo-item:hover {
     background: var(--ui-color-surface-container);
     border-color: var(--ui-color-outline);
+    box-shadow: var(--ui-shadow-sm);
   }
 
   .todo-item-completed {
-    opacity: 0.6;
+    opacity: 0.65;
   }
 
   .todo-checkbox-label {
@@ -113,11 +116,28 @@
     font-size: var(--ui-type-size-2xl);
     color: var(--ui-color-surface-variant-on);
     cursor: pointer;
-    transition: color var(--ui-duration-fast) var(--ui-ease-default);
+    transition: 
+      color var(--ui-duration-fast) var(--ui-ease-default),
+      transform var(--ui-duration-fast) var(--ui-ease-default);
+    border-radius: var(--ui-radius-sm);
+    padding: var(--ui-space-2xs);
+    margin: calc(var(--ui-space-2xs) * -1);
+    /* Make keyboard focusable via tabindex */
   }
 
   .todo-checkbox-label:hover {
     color: var(--ui-color-primary);
+  }
+
+  .todo-checkbox-label:focus,
+  .todo-checkbox-label:focus-visible {
+    outline: 2px solid var(--ui-color-primary);
+    outline-offset: 2px;
+    box-shadow: var(--ui-focus-ring);
+  }
+
+  .todo-checkbox-label:active {
+    transform: scale(0.95);
   }
 
   .todo-text-label {
@@ -126,7 +146,23 @@
     color: var(--ui-color-surface-on);
     cursor: pointer;
     user-select: none;
-    padding: var(--ui-space-xs) 0;
+    padding: var(--ui-space-xs) var(--ui-space-2xs);
+    border-radius: var(--ui-radius-sm);
+    transition: 
+      background var(--ui-duration-fast) var(--ui-ease-default),
+      color var(--ui-duration-fast) var(--ui-ease-default);
+    margin: calc(var(--ui-space-xs) * -1) 0;
+  }
+
+  .todo-text-label:hover {
+    background: var(--ui-color-surface-container);
+  }
+
+  .todo-text-label:focus,
+  .todo-text-label:focus-visible {
+    outline: 2px solid var(--ui-color-primary);
+    outline-offset: 2px;
+    box-shadow: var(--ui-focus-ring);
   }
 
   .todo-task-completed {
@@ -215,11 +251,11 @@
 
   @keyframes slideIn {
     from {
-      transform: translateX(100%);
+      transform: translateX(100%) scale(0.95);
       opacity: 0;
     }
     to {
-      transform: translateX(0);
+      transform: translateX(0) scale(1);
       opacity: 1;
     }
   }
@@ -242,6 +278,28 @@
 
     .todo-footer-actions {
       width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: var(--ui-space-sm);
+    }
+
+    .btn-sm {
+      padding: var(--ui-space-sm) var(--ui-space-md);
+      min-height: 44px;
+      font-size: var(--ui-type-size-sm);
+    }
+
+    .todo-checkbox-label {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .todo-item {
+      padding: var(--ui-space-sm);
+      min-height: 44px;
     }
   }
 }

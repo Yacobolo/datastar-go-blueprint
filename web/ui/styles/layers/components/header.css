@@ -17,7 +17,7 @@
     padding: var(--ui-space-sm) var(--ui-space-lg);
     background: var(--ui-color-surface-container);
     border-bottom: var(--ui-border-thin) solid var(--ui-color-outline-variant);
-    min-height: 60px;
+    min-height: var(--ui-space-3xl);
   }
 
   /* ========================================
@@ -35,11 +35,23 @@
     border-radius: var(--ui-radius-md);
     color: var(--ui-color-surface-variant-on);
     cursor: pointer;
-    transition: background var(--ui-duration-fast) var(--ui-ease-default);
+    transition: 
+      background var(--ui-duration-fast) var(--ui-ease-default),
+      transform var(--ui-duration-fast) var(--ui-ease-default);
   }
 
   .header-menu-toggle:hover {
     background: var(--ui-color-surface-container-high);
+  }
+
+  .header-menu-toggle:focus-visible {
+    outline: 2px solid var(--ui-color-primary);
+    outline-offset: 2px;
+    box-shadow: var(--ui-focus-ring);
+  }
+
+  .header-menu-toggle:active {
+    transform: scale(0.95);
   }
 
   /* ========================================
@@ -79,7 +91,8 @@
     cursor: pointer;
     transition: 
       background var(--ui-duration-fast) var(--ui-ease-default),
-      color var(--ui-duration-fast) var(--ui-ease-default);
+      color var(--ui-duration-fast) var(--ui-ease-default),
+      transform var(--ui-duration-fast) var(--ui-ease-default);
   }
 
   .header-icon-btn svg {
@@ -95,9 +108,11 @@
   .header-icon-btn:focus-visible {
     outline: 2px solid var(--ui-color-primary);
     outline-offset: 2px;
+    box-shadow: var(--ui-focus-ring);
   }
 
   .header-icon-btn:active {
+    transform: scale(0.95);
     background: var(--ui-color-surface-container-highest);
   }
 
