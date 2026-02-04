@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo"
-	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
+	"github.com/yacobolo/datastar-go-blueprint/internal/app"
+	"github.com/yacobolo/datastar-go-blueprint/internal/config"
+	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo"
+	"github.com/yacobolo/datastar-go-blueprint/web/resources"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/starfederation/datastar-go/datastar"

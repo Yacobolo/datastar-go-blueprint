@@ -5,7 +5,7 @@ package domain
 import (
 	"context"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
+	"github.com/yacobolo/datastar-go-blueprint/internal/store/queries"
 )
 
 // TodoRepository defines the interface for todo data access.

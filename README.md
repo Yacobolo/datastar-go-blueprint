@@ -1,6 +1,6 @@
-# Datastar Go Starter Kit
+# Datastar Go Blueprint
 
-A modern, opinionated starter kit for building reactive web applications with Go, Datastar, SQLite, and Lit web components.
+A modern, opinionated blueprint for building reactive web applications with Go, Datastar, SQLite, and Lit web components.
 
 ## Stack
 
@@ -35,11 +35,11 @@ A modern, opinionated starter kit for building reactive web applications with Go
 1. Clone this repository
 
 ```shell
-git clone https://github.com/yacobolo/datastar-go-starter-kit.git
-cd datastar-go-starter-kit
+git clone https://github.com/yacobolo/datastar-go-blueprint.git
+cd datastar-go-blueprint
 ```
 
-**Note for macOS users:** Port 5000 is used by macOS AirPlay Receiver (ControlCenter). This starter kit defaults to port 8080. You can customize the port by creating a `.env` file (see `.env.example`).
+**Note for macOS users:** Port 5000 is used by macOS AirPlay Receiver (ControlCenter). This blueprint defaults to port 8080. You can customize the port by creating a `.env` file (see `.env.example`).
 
 2. Install Dependencies
 
@@ -55,6 +55,7 @@ task tools:install
 ```
 
 Or install individually:
+
 ```shell
 go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 go install github.com/yacobolo/cssgen/cmd/cssgen@latest
@@ -92,6 +93,7 @@ hivemind Procfile.dev
 ```
 
 This starts three parallel processes with better visibility:
+
 - `server` - Air (Go hot reload)
 - `templ` - Templ watcher (template hot reload)
 - `assets` - esbuild watcher (CSS/JS bundling)
@@ -99,6 +101,7 @@ This starts three parallel processes with better visibility:
 Each process only rebuilds what changed, making development fast and efficient.
 
 **Requirements:** Install hivemind first:
+
 ```shell
 task tools:install  # Installs all tools including hivemind
 # or manually:
@@ -106,6 +109,7 @@ go install github.com/DarthSim/hivemind@latest
 ```
 
 **Controls:**
+
 - Stop: `Ctrl+C` or `task dev:stop`
 - Restart: `task dev:restart`
 
@@ -165,7 +169,7 @@ task css:lint              # Lint CSS usage
 
 ## Database
 
-This starter kit uses **SQLite** with **sqlc** for type-safe database queries.
+This blueprint uses **SQLite** with **sqlc** for type-safe database queries.
 
 ### Why SQLite + sqlc?
 
@@ -189,7 +193,7 @@ sqlite3 data/todos.db "SELECT * FROM todos;"
 
 ## Styling with Native CSS
 
-This starter kit uses **modern native CSS** - no Tailwind, no frameworks.
+This blueprint uses **modern native CSS** - no Tailwind, no frameworks.
 
 ### CSS Architecture
 
@@ -226,7 +230,7 @@ This starter kit uses **modern native CSS** - no Tailwind, no frameworks.
 
 ## Type-Safe CSS with cssgen
 
-This starter kit includes **cssgen**, a tool that generates Go constants from CSS classes and provides build-time validation.
+This blueprint includes **cssgen**, a tool that generates Go constants from CSS classes and provides build-time validation.
 
 ### Why Type-Safe CSS?
 
@@ -238,13 +242,15 @@ This starter kit includes **cssgen**, a tool that generates Go constants from CS
 ### Usage
 
 **Before (hardcoded strings):**
+
 ```go
 <button class="btn btn-primary btn-lg">Click</button>
 ```
 
 **After (type-safe constants):**
+
 ```go
-import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+import "github.com/yacobolo/datastar-go-blueprint/internal/ui"
 
 <button class={ ui.Btn, ui.BtnPrimary, ui.BtnLg }>Click</button>
 ```
@@ -292,6 +298,7 @@ For more details, see the [cssgen documentation](https://github.com/Yacobolo/css
 The todo component demonstrates a complete migration from Tailwind-style utility combinations to semantic, native CSS classes.
 
 **Before (Tailwind-style utilities):**
+
 ```go
 <div class="flex flex-col gap-sm">
     <div class="flex items-center gap-sm justify-center">
@@ -304,8 +311,9 @@ The todo component demonstrates a complete migration from Tailwind-style utility
 ```
 
 **After (Semantic native CSS with cssgen):**
+
 ```go
-import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
+import "github.com/yacobolo/datastar-go-blueprint/internal/ui"
 
 <div class={ ui.TodoHeader }>
     <div class={ ui.TodoTitleSection }>
@@ -320,6 +328,7 @@ import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
 ```
 
 **Benefits:**
+
 - ✅ Self-documenting class names (`.todo-title` vs `.text-4xl .font-bold .text-primary`)
 - ✅ Consistent with design system (all values use CSS variables)
 - ✅ Type-safe with IDE autocomplete
@@ -328,6 +337,7 @@ import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
 - ✅ Reusable components (`.callout` works across features)
 
 **Results:**
+
 - Adoption rate increased from 5.6% to 42.0%
 - All inline styles eliminated from todo.templ
 - Created 15+ semantic component classes
@@ -335,7 +345,7 @@ import "github.com/yacobolo/datastar-go-starter-kit/internal/ui"
 
 ## Type-Safe Datastar Attributes with datastar-templ
 
-This starter kit uses **datastar-templ** for compile-time type safety when working with Datastar attributes in templ templates.
+This blueprint uses **datastar-templ** for compile-time type safety when working with Datastar attributes in templ templates.
 
 ### Why datastar-templ?
 
@@ -353,6 +363,7 @@ import ds "github.com/Yacobolo/datastar-templ"
 ```
 
 **Before (inline strings):**
+
 ```go
 <div data-signals={ fmt.Sprintf("{count: %d}", count) }>
   <button data-on:click={ datastar.PostSSE("/increment") }>+</button>
@@ -361,6 +372,7 @@ import ds "github.com/Yacobolo/datastar-templ"
 ```
 
 **After (type-safe):**
+
 ```go
 <div { ds.Signals(ds.Int("count", count))... }>
   <button { ds.OnClick(ds.Post("/increment"))... }>+</button>
@@ -371,6 +383,7 @@ import ds "github.com/Yacobolo/datastar-templ"
 ### Common Patterns
 
 **Signals:**
+
 ```go
 { ds.Signals(
     ds.String("name", ""),
@@ -381,6 +394,7 @@ import ds "github.com/Yacobolo/datastar-templ"
 ```
 
 **Events:**
+
 ```go
 { ds.OnClick(ds.Post("/submit"))... }
 { ds.OnInput(ds.Get("/search?q=$query"), ds.ModDebounce, ds.Ms(300))... }
@@ -388,6 +402,7 @@ import ds "github.com/Yacobolo/datastar-templ"
 ```
 
 **Bindings:**
+
 ```go
 { ds.Bind("email")... }
 { ds.Text("$message")... }
@@ -395,6 +410,7 @@ import ds "github.com/Yacobolo/datastar-templ"
 ```
 
 **Multiple attributes:**
+
 ```go
 { ds.Merge(
     ds.OnClick(ds.Post("/submit")),
@@ -467,10 +483,10 @@ This creates a single binary with all assets embedded.
 
 ```shell
 # Build image
-docker build -t datastar-go-starter-kit:latest .
+docker build -t datastar-go-blueprint:latest .
 
 # Run container
-docker run --name datastar-app -p 8080:9001 datastar-go-starter-kit:latest
+docker run --name datastar-app -p 8080:9001 datastar-go-blueprint:latest
 ```
 
 The [Dockerfile](./Dockerfile) uses multi-stage builds and UPX compression for minimal image size.

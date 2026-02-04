@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/platform/router"
+	"github.com/yacobolo/datastar-go-blueprint/internal/app"
+	"github.com/yacobolo/datastar-go-blueprint/internal/config"
+	"github.com/yacobolo/datastar-go-blueprint/internal/platform/router"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

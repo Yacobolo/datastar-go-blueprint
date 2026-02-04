@@ -1,4 +1,4 @@
-module github.com/yacobolo/datastar-go-starter-kit
+module github.com/yacobolo/datastar-go-blueprint
 
 go 1.25.0
 

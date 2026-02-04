@@ -3,8 +3,8 @@ package store
 import (
 	"context"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/domain"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
+	"github.com/yacobolo/datastar-go-blueprint/internal/domain"
+	"github.com/yacobolo/datastar-go-blueprint/internal/store/queries"
 )
 
 // TodoRepository is the concrete implementation of domain.TodoRepository.

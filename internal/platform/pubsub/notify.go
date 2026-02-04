@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/nats-io/nats.go"
-	commoncomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
+	commoncomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/common/components"
 )
 
 // UpdateMessage is the payload sent over NATS for UI updates

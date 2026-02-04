@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strconv"
 
-	commoncomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/common/components"
-	todocomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/components"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/pages"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/platform/pubsub"
+	commoncomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/common/components"
+	todocomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/todo/components"
+	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/pages"
+	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/services"
+	"github.com/yacobolo/datastar-go-blueprint/internal/platform/pubsub"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -75,7 +75,7 @@ func subject(sessionID string) string {
 
 // IndexPage renders the initial page
 func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
-	if err := pages.IndexPage("Datastar Go Starter Kit").Render(r.Context(), w); err != nil {
+	if err := pages.IndexPage("Datastar Go Blueprint").Render(r.Context(), w); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }

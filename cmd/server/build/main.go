@@ -11,8 +11,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
-	"github.com/yacobolo/datastar-go-starter-kit/web/resources"
+	"github.com/yacobolo/datastar-go-blueprint/internal/config"
+	"github.com/yacobolo/datastar-go-blueprint/web/resources"
 
 	"github.com/evanw/esbuild/pkg/api"
 	"golang.org/x/sync/errgroup"

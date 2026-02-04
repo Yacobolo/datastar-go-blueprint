@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/domain"
-	todocomponents "github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/components"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/store/queries"
+	"github.com/yacobolo/datastar-go-blueprint/internal/domain"
+	todocomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/todo/components"
+	"github.com/yacobolo/datastar-go-blueprint/internal/store/queries"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"

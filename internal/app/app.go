@@ -12,10 +12,10 @@ import (
 	embeddednats "github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
 
-	"github.com/yacobolo/datastar-go-starter-kit/internal/config"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/domain"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/features/todo/services"
-	"github.com/yacobolo/datastar-go-starter-kit/internal/store"
+	"github.com/yacobolo/datastar-go-blueprint/internal/config"
+	"github.com/yacobolo/datastar-go-blueprint/internal/domain"
+	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/services"
+	"github.com/yacobolo/datastar-go-blueprint/internal/store"
 )
 
 // Repositories holds all repository implementations (driven adapters).

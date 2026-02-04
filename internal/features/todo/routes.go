@@ -1,7 +1,7 @@
 package todo
 
 import (
-	"github.com/yacobolo/datastar-go-starter-kit/internal/app"
+	"github.com/yacobolo/datastar-go-blueprint/internal/app"
 
 	"github.com/go-chi/chi/v5"
 )
