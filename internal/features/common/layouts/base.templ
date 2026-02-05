@@ -34,10 +34,12 @@ templ Base(title string) {
 			<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 			<link href={ resources.StaticPath("styles.css") } rel="stylesheet" type="text/css"/>
 			<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
+			<script type="module" src={ resources.StaticPath("libs/index.js") }></script>
 		</head>
 		<body { ds.SignalsJSON(baseSignals())... }>
 			if config.Global.Environment == config.Dev {
 				<div { ds.Init(ds.Get("/reload", ds.Opt("retryMaxCount", "1000"), ds.Opt("retryInterval", "20"), ds.Opt("retryMaxWaitMs", "200")))... }></div>
+				<datastar-inspector></datastar-inspector>
 			}
 			<!-- App Shell -->
 			<div class={ ui.AppShell }>
