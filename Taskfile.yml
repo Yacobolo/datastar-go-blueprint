@@ -52,7 +52,7 @@ tasks:
       - web/resources/static/libs/*.js
       - web/resources/static/theme-switcher.js
     cmds:
-      - go run cmd/server/build/main.go
+      - go run -tags=dev cmd/server/build/main.go
 
   # ====================
   # Production Build
