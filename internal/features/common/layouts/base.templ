@@ -4,6 +4,7 @@ import (
 	ds "github.com/Yacobolo/datastar-templ"
 	"github.com/yacobolo/datastar-go-blueprint/internal/config"
 	"github.com/yacobolo/datastar-go-blueprint/internal/features/common/components"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
 	"github.com/yacobolo/datastar-go-blueprint/web/resources"
 )
 
@@ -39,13 +40,13 @@ templ Base(title string) {
 				<div { ds.Init(ds.Get("/reload", ds.Opt("retryMaxCount", "1000"), ds.Opt("retryInterval", "20"), ds.Opt("retryMaxWaitMs", "200")))... }></div>
 			}
 			<!-- App Shell -->
-			<div class="app-shell">
+			<div class={ ui.AppShell }>
 				<!-- Desktop Sidebar -->
 				@components.Sidebar()
 				<!-- Content Area -->
-				<div class="app-content">
+				<div class={ ui.AppContent }>
 					@components.Header(title)
-					<main class="app-main">
+					<main class={ ui.AppMain }>
 						{ children... }
 					</main>
 				</div>

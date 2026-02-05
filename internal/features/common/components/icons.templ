@@ -1,8 +1,12 @@
 package components
 
+import (
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
+)
+
 // IconSun renders a sun icon for light mode
 templ IconSun() {
-	<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<svg class={ ui.Icon } viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 		<circle cx="12" cy="12" r="4"></circle>
 		<path d="M12 2v2"></path>
 		<path d="M12 20v2"></path>
@@ -17,14 +21,14 @@ templ IconSun() {
 
 // IconMoon renders a moon icon for dark mode
 templ IconMoon() {
-	<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<svg class={ ui.Icon } viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 		<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
 	</svg>
 }
 
 // IconMonitor renders a monitor/computer icon for system theme
 templ IconMonitor() {
-	<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<svg class={ ui.Icon } viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 		<rect width="20" height="14" x="2" y="3" rx="2"></rect>
 		<line x1="8" x2="16" y1="21" y2="21"></line>
 		<line x1="12" x2="12" y1="17" y2="21"></line>
@@ -33,7 +37,7 @@ templ IconMonitor() {
 
 // IconMenu renders a hamburger menu icon for mobile navigation
 templ IconMenu() {
-	<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<svg class={ ui.Icon } viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 		<line x1="4" x2="20" y1="12" y2="12"></line>
 		<line x1="4" x2="20" y1="6" y2="6"></line>
 		<line x1="4" x2="20" y1="18" y2="18"></line>

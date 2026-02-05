@@ -3,17 +3,18 @@ package pages
 import (
 	ds "github.com/Yacobolo/datastar-templ"
 	"github.com/yacobolo/datastar-go-blueprint/internal/features/common/layouts"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
 )
 
 templ IndexPage(title string) {
 	@layouts.Base(title) {
-		<div class="page">
+		<div class={ ui.Page }>
 			<div id="todos-container" { ds.Init(ds.Get("/api/todos/updates", ds.Opt("requestCancellation", "disabled")))... }>
-				<div class="todo-loading">
+				<div class={ ui.TodoLoading }>
 					<p>Loading todos...</p>
 				</div>
 			</div>
-			<div id="toast-container" class="toast-container"></div>
+			<div id="toast-container" class={ ui.ToastContainer }></div>
 		</div>
 	}
 }

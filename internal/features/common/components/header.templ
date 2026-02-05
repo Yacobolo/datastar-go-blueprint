@@ -2,14 +2,15 @@ package components
 
 import (
 	ds "github.com/Yacobolo/datastar-templ"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
 )
 
 // Header renders the app header with theme toggle
 templ Header(title string) {
-	<header class="app-header">
+	<header class={ ui.AppHeader }>
 		<!-- Mobile Menu Toggle -->
 		<button
-			class="header-menu-toggle"
+			class={ ui.HeaderMenuToggle }
 			{ ds.OnClick("$sidebarOpen = !$sidebarOpen")... }
 			aria-label="Open menu"
 			type="button"
@@ -17,14 +18,14 @@ templ Header(title string) {
 			@IconMenu()
 		</button>
 		<!-- App Title/Logo -->
-		<div class="header-title">
+		<div class={ ui.HeaderTitle }>
 			<h1>{ title }</h1>
 		</div>
 		<!-- Spacer -->
-		<div class="header-spacer"></div>
+		<div class={ ui.HeaderSpacer }></div>
 		<!-- Theme Toggle -->
 		<button
-			class="header-icon-btn"
+			class={ ui.HeaderIconBtn }
 			{ ds.OnClick("$theme = window.themeToggle.cycle()")... }
 			{ ds.AttrKey("title", "'Theme: ' + $theme")... }
 			aria-label="Toggle theme"

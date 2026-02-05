@@ -1,3 +1,4 @@
+// Package pubsub provides NATS-based pub/sub utilities for real-time updates.
 package pubsub
 
 import (
@@ -13,6 +14,7 @@ type UpdateMessage struct {
 	Toast        *ToastData `json:"toast,omitempty"`
 }
 
+// ToastData contains the data for a toast notification.
 type ToastData struct {
 	Message string                     `json:"message"`
 	Type    commoncomponents.ToastType `json:"type"`

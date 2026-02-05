@@ -6,9 +6,11 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// SetupRoutes configures all todo-related HTTP routes.
 func SetupRoutes(router chi.Router, application *app.App) error {
 	// Extract specific dependencies from App and pass to handlers
 	handlers := NewHandlers(
+		application.Logger,
 		application.Services.Todo,
 		application.NATS,
 		application.SessionStore,

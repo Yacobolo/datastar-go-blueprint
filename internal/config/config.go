@@ -1,3 +1,4 @@
+// Package config provides application configuration management.
 package config
 
 import (
@@ -8,13 +9,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Environment represents the application runtime environment.
 type Environment string
 
 const (
-	Dev  Environment = "dev"
+	// Dev is the development environment.
+	Dev Environment = "dev"
+	// Prod is the production environment.
 	Prod Environment = "prod"
 )
 
+// Config holds all application configuration values.
 type Config struct {
 	Environment   Environment
 	Host          string
@@ -25,6 +30,7 @@ type Config struct {
 }
 
 var (
+	// Global holds the singleton configuration instance.
 	Global *Config
 	once   sync.Once
 )
@@ -43,7 +49,7 @@ func getEnv(key, fallback string) string {
 }
 
 func loadBase() *Config {
-	godotenv.Load()
+	_ = godotenv.Load()
 
 	return &Config{
 		Host:   getEnv("HOST", "0.0.0.0"),

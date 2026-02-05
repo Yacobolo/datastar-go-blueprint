@@ -28,7 +28,7 @@ type SQLiteStore struct {
 func Open(dsn string) (*SQLiteStore, error) {
 	// Ensure the directory exists
 	dir := filepath.Dir(dsn)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return nil, fmt.Errorf("failed to create database directory: %w", err)
 	}
 
@@ -110,6 +110,8 @@ func (s *SQLiteStore) WithinTransaction(ctx context.Context, fn func(txCtx conte
 // conn returns the appropriate queries.Queries instance for the given context.
 // If the context contains a transaction, it returns queries bound to that transaction.
 // Otherwise, it returns queries bound to the main database connection.
+//
+//nolint:unused // Reserved for future transaction support
 func (s *SQLiteStore) conn(ctx context.Context) *queries.Queries {
 	if tx, ok := ctx.Value(txKey{}).(*sql.Tx); ok {
 		return s.queries.WithTx(tx)

@@ -32,6 +32,7 @@ type Services struct {
 // App is the main application struct that holds all dependencies.
 // This acts as the dependency injection container for the entire application.
 type App struct {
+	Logger       *slog.Logger
 	Store        *store.SQLiteStore
 	SessionStore sessions.Store
 	NATS         *nats.Conn
@@ -46,7 +47,7 @@ type App struct {
 // 1. Initialize infrastructure (SessionStore, NATS server, NATS client, Database)
 // 2. Create repositories (driven adapters) from the Store
 // 3. Create services (application layer) with repository dependencies
-func New(cfg *config.Config) (*App, error) {
+func New(cfg *config.Config, logger *slog.Logger) (*App, error) {
 	// 1. Create SessionStore
 	sessionStore := sessions.NewCookieStore([]byte(cfg.SessionSecret))
 	sessionStore.MaxAge(86400 * 30) // 30 days
@@ -70,7 +71,7 @@ func New(cfg *config.Config) (*App, error) {
 		return nil, fmt.Errorf("NATS not ready")
 	}
 
-	slog.Info("NATS server started", "url", ns.ClientURL())
+	logger.Info("NATS server started", "url", ns.ClientURL())
 
 	// 3. Connect to NATS
 	nc, err := nats.Connect(ns.ClientURL())
@@ -87,7 +88,7 @@ func New(cfg *config.Config) (*App, error) {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	slog.Info("database initialized", "path", cfg.DBPath)
+	logger.Info("database initialized", "path", cfg.DBPath)
 
 	// 5. Create repositories (driven adapters)
 	repos := &Repositories{
@@ -102,6 +103,7 @@ func New(cfg *config.Config) (*App, error) {
 	}
 
 	return &App{
+		Logger:       logger,
 		Store:        dbStore,
 		SessionStore: sessionStore,
 		NATS:         nc,

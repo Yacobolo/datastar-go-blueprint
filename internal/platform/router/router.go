@@ -1,3 +1,4 @@
+// Package router configures HTTP routes and middleware.
 package router
 
 import (
@@ -14,7 +15,8 @@ import (
 	"github.com/starfederation/datastar-go/datastar"
 )
 
-func SetupRoutes(ctx context.Context, router chi.Router, application *app.App) error {
+// SetupRoutes configures all HTTP routes for the application.
+func SetupRoutes(_ context.Context, router chi.Router, application *app.App) error {
 
 	if config.Global.Environment == config.Dev {
 		setupReload(router)
@@ -36,7 +38,7 @@ func setupReload(router chi.Router) {
 
 	router.Get("/reload", func(w http.ResponseWriter, r *http.Request) {
 		sse := datastar.NewSSE(w, r)
-		reload := func() { sse.ExecuteScript("window.location.reload()") }
+		reload := func() { _ = sse.ExecuteScript("window.location.reload()") }
 		hotReloadOnce.Do(reload)
 		select {
 		case <-reloadChan:
@@ -45,13 +47,13 @@ func setupReload(router chi.Router) {
 		}
 	})
 
-	router.Get("/hotreload", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/hotreload", func(w http.ResponseWriter, _ *http.Request) {
 		select {
 		case reloadChan <- struct{}{}:
 		default:
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 }

@@ -1,8 +1,10 @@
+// Package services contains business logic for the todo feature.
 package services
 
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -15,12 +17,14 @@ import (
 	"github.com/samber/lo"
 )
 
+// TodoService provides business logic for managing todos.
 type TodoService struct {
 	todoRepo    domain.TodoRepository
 	sessionRepo domain.SessionRepository
 	store       sessions.Store
 }
 
+// NewTodoService creates a new TodoService with the given repositories.
 func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRepository, store sessions.Store) *TodoService {
 	return &TodoService{
 		todoRepo:    todoRepo,
@@ -29,6 +33,7 @@ func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRe
 	}
 }
 
+// GetSessionMVC retrieves the TodoMVC state for the current session.
 func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *todocomponents.TodoMVC, error) {
 	ctx := r.Context()
 	sessionID, err := s.upsertSessionID(r, w)
@@ -49,7 +54,7 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (*todocomponents.TodoMVC, error) {
 	// Get todos from database
 	dbTodos, err := s.todoRepo.GetTodosByUser(ctx, sessionID)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to get todos: %w", err)
 	}
 
@@ -94,14 +99,17 @@ func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (
 	return mvc, nil
 }
 
+// SaveMVC persists the TodoMVC state to the database.
 func (s *TodoService) SaveMVC(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
 	return s.saveMVCToDB(ctx, sessionID, mvc)
 }
 
+// ResetMVC resets the TodoMVC to its initial state.
 func (s *TodoService) ResetMVC(mvc *todocomponents.TodoMVC) {
 	s.resetMVC(mvc)
 }
 
+// ToggleTodo toggles the completion state of a todo by index.
 func (s *TodoService) ToggleTodo(mvc *todocomponents.TodoMVC, index int) {
 	if index < 0 {
 		setCompletedTo := false
@@ -120,6 +128,7 @@ func (s *TodoService) ToggleTodo(mvc *todocomponents.TodoMVC, index int) {
 	}
 }
 
+// EditTodo updates or creates a todo with the given text.
 func (s *TodoService) EditTodo(mvc *todocomponents.TodoMVC, index int, text string) {
 	if index >= 0 && index < len(mvc.Todos) {
 		mvc.Todos[index].Text = text
@@ -132,24 +141,28 @@ func (s *TodoService) EditTodo(mvc *todocomponents.TodoMVC, index int, text stri
 	mvc.EditingIdx = -1
 }
 
+// DeleteTodo removes a todo by index or clears completed todos if index is -1.
 func (s *TodoService) DeleteTodo(mvc *todocomponents.TodoMVC, index int) {
 	if index >= 0 && index < len(mvc.Todos) {
 		mvc.Todos = append(mvc.Todos[:index], mvc.Todos[index+1:]...)
 	} else if index < 0 {
-		mvc.Todos = lo.Filter(mvc.Todos, func(todo *todocomponents.Todo, i int) bool {
+		mvc.Todos = lo.Filter(mvc.Todos, func(todo *todocomponents.Todo, _ int) bool {
 			return !todo.Completed
 		})
 	}
 }
 
+// SetMode changes the view filter mode for todos.
 func (s *TodoService) SetMode(mvc *todocomponents.TodoMVC, mode todocomponents.TodoViewMode) {
 	mvc.Mode = mode
 }
 
+// StartEditing puts a todo into edit mode.
 func (s *TodoService) StartEditing(mvc *todocomponents.TodoMVC, index int) {
 	mvc.EditingIdx = index
 }
 
+// CancelEditing exits edit mode without saving.
 func (s *TodoService) CancelEditing(mvc *todocomponents.TodoMVC) {
 	mvc.EditingIdx = -1
 }

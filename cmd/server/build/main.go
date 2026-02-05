@@ -1,3 +1,4 @@
+// Package main provides the build tool for compiling frontend assets.
 package main
 
 import (
@@ -27,12 +28,13 @@ func main() {
 	flag.Parse()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-	defer stop()
 
 	if err := run(ctx); err != nil {
-		slog.Error("failure", "error", err)
+		slog.Error("failure", "error", err) //nolint:sloglint // Build tool, global logger acceptable
+		stop()
 		os.Exit(1)
 	}
+	stop()
 }
 
 func run(ctx context.Context) error {
@@ -75,15 +77,16 @@ func build(ctx context.Context) error {
 	}
 
 	if watch {
-		slog.Info("watching...")
+		slog.Info("watching...") //nolint:sloglint // Build tool, global logger acceptable
 
 		opts.Plugins = append(opts.Plugins, api.Plugin{
 			Name: "hotreload",
 			Setup: func(build api.PluginBuild) {
 				build.OnEnd(func(result *api.BuildResult) (api.OnEndResult, error) {
-					slog.Info("build complete", "errors", len(result.Errors), "warnings", len(result.Warnings))
+					slog.Info("build complete", "errors", len(result.Errors), "warnings", len(result.Warnings)) //nolint:sloglint // Build tool, global logger acceptable
 					if len(result.Errors) == 0 {
-						http.Get(fmt.Sprintf("http://%s:%s/hotreload", config.Global.Host, config.Global.Port))
+						//nolint:noctx // Build tool hot reload trigger, context not needed
+						_, _ = http.Get(fmt.Sprintf("http://%s:%s/hotreload", config.Global.Host, config.Global.Port))
 					}
 					return api.OnEndResult{}, nil
 				})
@@ -104,7 +107,7 @@ func build(ctx context.Context) error {
 		return nil
 	}
 
-	slog.Info("building...")
+	slog.Info("building...") //nolint:sloglint // Build tool, global logger acceptable
 
 	result := api.Build(opts)
 

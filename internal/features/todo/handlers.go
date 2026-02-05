@@ -1,3 +1,4 @@
+// Package todo implements the todo feature handlers and routes.
 package todo
 
 import (
@@ -19,7 +20,7 @@ import (
 	"github.com/starfederation/datastar-go/datastar"
 )
 
-// Helper functions
+// RequireSession retrieves or creates a session ID for the current request.
 func RequireSession(store sessions.Store, w http.ResponseWriter, r *http.Request) (string, bool) {
 	sess, err := store.Get(r, "connections")
 	if err != nil {
@@ -39,6 +40,7 @@ func RequireSession(store sessions.Store, w http.ResponseWriter, r *http.Request
 	return id, true
 }
 
+// RequireIntParam extracts and parses an integer URL parameter.
 func RequireIntParam(w http.ResponseWriter, r *http.Request, param string) (int, bool) {
 	val, err := strconv.Atoi(chi.URLParam(r, param))
 	if err != nil {
@@ -48,20 +50,25 @@ func RequireIntParam(w http.ResponseWriter, r *http.Request, param string) (int,
 	return val, true
 }
 
-func LogConsoleError(sse *datastar.ServerSentEventGenerator, err error) {
+// LogConsoleError sends an error to the browser console via SSE.
+func (h *Handlers) LogConsoleError(sse *datastar.ServerSentEventGenerator, err error) {
 	if err := sse.ConsoleError(err); err != nil {
-		slog.Error("failed to send console error", "error", err)
+		h.logger.Error("failed to send console error", "error", err)
 	}
 }
 
+// Handlers holds dependencies for todo HTTP handlers.
 type Handlers struct {
+	logger       *slog.Logger
 	todoService  *services.TodoService
 	nats         *nats.Conn
 	sessionStore sessions.Store
 }
 
-func NewHandlers(todoService *services.TodoService, nats *nats.Conn, sessionStore sessions.Store) *Handlers {
+// NewHandlers creates a new Handlers instance with the given dependencies.
+func NewHandlers(logger *slog.Logger, todoService *services.TodoService, nats *nats.Conn, sessionStore sessions.Store) *Handlers {
 	return &Handlers{
+		logger:       logger,
 		todoService:  todoService,
 		nats:         nats,
 		sessionStore: sessionStore,
@@ -92,7 +99,7 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 
 	// Send initial state
 	if err := h.refreshTodos(ctx, sse, sessionID); err != nil {
-		LogConsoleError(sse, err)
+		h.LogConsoleError(sse, err)
 		return
 	}
 
@@ -100,10 +107,10 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 	msgChan := make(chan *nats.Msg, 64)
 	sub, err := h.nats.ChanSubscribe(subject(sessionID), msgChan)
 	if err != nil {
-		LogConsoleError(sse, err)
+		h.LogConsoleError(sse, err)
 		return
 	}
-	defer sub.Unsubscribe()
+	defer func() { _ = sub.Unsubscribe() }()
 
 	// Listen for updates
 	for {
@@ -113,14 +120,14 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 		case natsMsg := <-msgChan:
 			updateMsg, err := pubsub.ParseUpdateMessage(natsMsg.Data)
 			if err != nil {
-				slog.Error("failed to parse update message", "error", err)
+				h.logger.Error("failed to parse update message", "error", err)
 				continue
 			}
 
 			// Refresh TODO list if requested
 			if updateMsg.RefreshTodos {
 				if err := h.refreshTodos(ctx, sse, sessionID); err != nil {
-					LogConsoleError(sse, err)
+					h.LogConsoleError(sse, err)
 					return
 				}
 			}
@@ -133,7 +140,7 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 					datastar.WithSelectorID("toast-container"),
 					datastar.WithModeAppend(),
 				); err != nil {
-					slog.Error("failed to send toast", "error", err)
+					h.logger.Error("failed to send toast", "error", err)
 				}
 			}
 		}
@@ -154,7 +161,7 @@ func (h *Handlers) refreshTodos(ctx context.Context, sse *datastar.ServerSentEve
 // notifyUpdate publishes a NATS message to trigger UI refresh
 func (h *Handlers) notifyUpdate(sessionID string, opts ...pubsub.NotifyOption) {
 	if err := pubsub.Notify(h.nats, subject(sessionID), opts...); err != nil {
-		slog.Error("failed to notify update", "error", err)
+		h.logger.Error("failed to notify update", "error", err)
 	}
 }
 
