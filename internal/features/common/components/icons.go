@@ -21,11 +21,6 @@ func IconMoon() g.Node {
 	return lucide.Moon(icon())
 }
 
-// IconMonitor renders a monitor/computer icon for system theme.
-func IconMonitor() g.Node {
-	return lucide.Monitor(icon())
-}
-
 // IconMenu renders a hamburger menu icon for mobile navigation.
 func IconMenu() g.Node {
 	return lucide.Menu(icon())
@@ -51,13 +46,8 @@ func IconTrash() g.Node {
 	return lucide.Trash2(icon())
 }
 
-// IconReset renders a reset/list-management icon.
-func IconReset() g.Node {
-	return lucide.ListChecks(icon())
-}
-
-// IconToggleAll renders the bulk-toggle icon.
-func IconToggleAll() g.Node {
+// IconListChecks renders a list/check management icon.
+func IconListChecks() g.Node {
 	return lucide.ListChecks(icon())
 }
 

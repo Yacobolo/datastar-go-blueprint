@@ -79,6 +79,10 @@ func Base(title string, children ...g.Node) g.Node {
 					document.documentElement.dataset.theme = resolved;
 				})();
 			`)),
+				h.Link(
+					h.Rel("icon"),
+					h.Href(`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235706df'/%3E%3Cpath d='M18 33l9 9 19-21' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`),
+				),
 				h.Link(h.Href(resources.StaticPath("styles.css")), h.Rel("stylesheet"), h.Type("text/css")),
 				h.Script(h.Type("module"), h.Src(resources.StaticPath("theme-switcher.js"))),
 				h.Script(h.Type("module"), h.Src("https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js")),

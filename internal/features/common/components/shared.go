@@ -26,19 +26,6 @@ func when(condition bool, value string) string {
 	return ""
 }
 
-// KVPairsAttrs converts key/value pairs into gomponents attributes.
-func KVPairsAttrs(kvPairs ...string) g.Group {
-	if len(kvPairs)%2 != 0 {
-		panic("kvPairs must be a multiple of 2")
-	}
-
-	attrs := make(g.Group, 0, len(kvPairs)/2)
-	for i := 0; i < len(kvPairs); i += 2 {
-		attrs = append(attrs, g.Attr(kvPairs[i], kvPairs[i+1]))
-	}
-	return attrs
-}
-
 // SseIndicator renders a shared loading indicator bound to a Datastar signal.
 func SseIndicator(signalName string) g.Node {
 	return h.Span(

@@ -88,7 +88,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 			modeButtons = append(modeButtons,
 				h.Button(
 					h.Type("button"),
-					h.Class("btn btn-sm join-item btn-active"),
+					h.Class("btn btn-sm join-item btn-primary"),
 					g.Text(TodoViewModeStrings[i]),
 				),
 			)
@@ -124,7 +124,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 			h.Class("btn btn-outline btn-sm"),
 			h.Title("Reset list"),
 			data.On("click", appds.Put("/api/todos/reset")),
-			commoncomponents.IconReset(),
+			commoncomponents.IconListChecks(),
 			h.Span(g.Text("Reset")),
 		),
 	)
@@ -143,6 +143,10 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 						h.Class("space-y-1"),
 						h.P(h.Class("text-sm uppercase tracking-[0.2em] text-base-content/60"), g.Text("Template")),
 						h.H1(h.Class("text-4xl font-bold tracking-tight text-primary"), g.Text("todos")),
+						h.P(
+							h.Class("max-w-xl text-sm text-base-content/70"),
+							g.Text("A small server-rendered TodoMVC starter built with Go, Datastar, Tailwind, and DaisyUI."),
+						),
 					),
 					h.Div(
 						h.Class("flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"),
@@ -155,7 +159,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 							data.On("click", appds.Post("/api/todos/-1/toggle")),
 							data.Indicator("toggleAllFetching"),
 							data.Attr("disabled", "$toggleAllFetching"),
-							commoncomponents.IconToggleAll(),
+							commoncomponents.IconListChecks(),
 						)),
 						g.If(mvc.EditingIdx < 0, TodoInput(-1)),
 						commoncomponents.SseIndicator("toggleAllFetching"),
@@ -166,6 +170,24 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 					h.Ul(
 						h.Class("space-y-3"),
 						rows,
+					),
+				)),
+				g.If(!hasTodos, h.Div(
+					h.Class("hero rounded-box border border-dashed border-base-300 bg-base-200/60 py-8"),
+					h.Div(
+						h.Class("hero-content text-center"),
+						h.Div(
+							h.Class("max-w-md space-y-3"),
+							h.Div(
+								h.Class("flex justify-center"),
+								h.Span(h.Class("badge badge-primary badge-outline"), g.Text("Ready")),
+							),
+							h.H2(h.Class("text-2xl font-semibold"), g.Text("Start with your first todo")),
+							h.P(
+								h.Class("text-sm text-base-content/70"),
+								g.Text("Type something above and press Enter to seed the list. The rest of the UI updates live from the server."),
+							),
+						),
 					),
 				)),
 				g.If(hasTodos, h.Div(
@@ -213,8 +235,16 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 	if isEditing {
 		return h.Li(
 			h.ID(fmt.Sprintf("todo%d", i)),
-			h.Class("rounded-box border border-base-300 bg-base-100 p-3 shadow-sm"),
-			TodoInput(i),
+			h.Class("rounded-box border border-primary/30 bg-base-100 p-3 shadow-sm"),
+			h.Div(
+				h.Class("space-y-3"),
+				h.Div(
+					h.Class("flex items-center justify-between gap-3"),
+					h.Span(h.Class("badge badge-primary badge-outline"), g.Text("Editing")),
+					h.Span(h.Class("text-xs text-base-content/60"), g.Text("Press Enter to save")),
+				),
+				TodoInput(i),
+			),
 		)
 	}
 
