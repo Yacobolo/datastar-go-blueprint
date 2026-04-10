@@ -18,7 +18,7 @@ task test:coverage
 go test -run TestFunctionName ./path/to/package
 
 # Run tests in specific package
-go test ./internal/features/todo
+go test ./internal/ui/todo
 ```
 
 ### Linting
@@ -79,7 +79,7 @@ Use import aliases for clarity:
   - `. "maragu.dev/gomponents"`
   - `. "maragu.dev/gomponents/html"`
 - `data "maragu.dev/gomponents-datastar"` - Datastar attributes in gomponents views
-- Package aliases to avoid conflicts: `commoncomponents`, `todocomponents`
+- Prefer short aliases only when they add clarity, e.g. `core` for `internal/ui/core`
 
 ### Naming Conventions
 
@@ -188,10 +188,10 @@ This codebase follows hexagonal architecture:
 
 **Domain (Core):**
 - `internal/domain/` - Define interfaces (ports)
-- `internal/features/*/services/` - Business logic
+- `internal/services/` - Business logic and feature UI state models
 
 **Adapters:**
-- **Driving** (Primary): `internal/features/*/handlers.go`, `routes.go`
+- **Driving** (Primary): `internal/ui/*/handlers.go`, `routes.go`
 - **Driven** (Secondary): `internal/store/*_repository.go`
 
 **Infrastructure:**
@@ -250,16 +250,24 @@ func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### Feature-Based Organization
-Organize code by feature (vertical slices), not layer:
+### Flat UI Organization
+Organize shared UI and feature UI with a flat structure:
 
 ```
-internal/features/todo/
-├── components/        # UI components (gomponents)
-├── pages/             # Full page layouts (gomponents)
-├── services/          # Business logic
-├── handlers.go        # HTTP handlers
-└── routes.go          # Route registration
+internal/ui/core/
+├── component_header.go
+├── component_sidebar.go
+├── component_toast.go
+└── layout_base.go
+
+internal/ui/todo/
+├── component_todo.go
+├── page_index.go
+├── handlers.go
+└── routes.go
+
+internal/services/
+└── todo_service.go
 ```
 
 ### Database Patterns

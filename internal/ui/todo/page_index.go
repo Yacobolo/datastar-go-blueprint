@@ -1,9 +1,9 @@
-// Package pages contains full-page gomponents views for the todo feature.
-package pages
+// Package todo contains full-page gomponents views for the todo feature.
+package todo
 
 import (
-	"github.com/yacobolo/datastar-go-blueprint/internal/features/common/layouts"
 	appds "github.com/yacobolo/datastar-go-blueprint/internal/platform/ds"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui/core"
 
 	g "maragu.dev/gomponents"
 	data "maragu.dev/gomponents-datastar"
@@ -12,7 +12,7 @@ import (
 
 // IndexPage renders the todo app shell.
 func IndexPage(title string) g.Node {
-	return layouts.Base(
+	return core.Base(
 		title,
 		h.Div(
 			h.Class("w-full"),

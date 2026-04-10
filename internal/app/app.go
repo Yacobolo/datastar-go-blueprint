@@ -14,7 +14,7 @@ import (
 
 	"github.com/yacobolo/datastar-go-blueprint/internal/config"
 	"github.com/yacobolo/datastar-go-blueprint/internal/domain"
-	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/services"
+	"github.com/yacobolo/datastar-go-blueprint/internal/services"
 	"github.com/yacobolo/datastar-go-blueprint/internal/store"
 )
 

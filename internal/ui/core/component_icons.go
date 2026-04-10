@@ -1,4 +1,4 @@
-package components
+package core
 
 import (
 	lucide "github.com/eduardolat/gomponents-lucide"

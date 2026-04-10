@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/yacobolo/datastar-go-blueprint/internal/domain"
-	todocomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/todo/components"
 	"github.com/yacobolo/datastar-go-blueprint/internal/store/queries"
 
 	"github.com/google/uuid"
@@ -34,7 +33,7 @@ func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRe
 }
 
 // GetSessionMVC retrieves the TodoMVC state for the current session.
-func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *todocomponents.TodoMVC, error) {
+func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (string, *TodoMVC, error) {
 	ctx := r.Context()
 	sessionID, err := s.upsertSessionID(r, w)
 	if err != nil {
@@ -51,7 +50,7 @@ func (s *TodoService) GetSessionMVC(w http.ResponseWriter, r *http.Request) (str
 
 // GetMVCBySessionID gets the TodoMVC state for a given session ID.
 // This is used by SSE handlers that already have the session ID.
-func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (*todocomponents.TodoMVC, error) {
+func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (*TodoMVC, error) {
 	// Get todos from database
 	dbTodos, err := s.todoRepo.GetTodosByUser(ctx, sessionID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
@@ -60,20 +59,20 @@ func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (
 
 	// Get session to load UI state
 	session, err := s.sessionRepo.GetSession(ctx, sessionID)
-	mode := todocomponents.TodoViewModeAll
+	mode := TodoViewModeAll
 	editingIdx := -1
 
 	if err == nil {
 		// Session exists, load UI state
 		if session.Mode.Valid {
-			mode = todocomponents.TodoViewMode(session.Mode.Int64)
+			mode = TodoViewMode(session.Mode.Int64)
 		}
 		if session.EditingIdx.Valid {
 			editingIdx = int(session.EditingIdx.Int64)
 		}
 	}
 
-	mvc := &todocomponents.TodoMVC{
+	mvc := &TodoMVC{
 		Mode:       mode,
 		EditingIdx: editingIdx,
 	}
@@ -87,9 +86,9 @@ func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (
 			return nil, fmt.Errorf("failed to save default todos: %w", err)
 		}
 	} else {
-		mvc.Todos = make([]*todocomponents.Todo, len(dbTodos))
+		mvc.Todos = make([]*Todo, len(dbTodos))
 		for i, dbTodo := range dbTodos {
-			mvc.Todos[i] = &todocomponents.Todo{
+			mvc.Todos[i] = &Todo{
 				Text:      dbTodo.Task,
 				Completed: dbTodo.Completed.Int64 == 1,
 			}
@@ -100,17 +99,17 @@ func (s *TodoService) GetMVCBySessionID(ctx context.Context, sessionID string) (
 }
 
 // SaveMVC persists the TodoMVC state to the database.
-func (s *TodoService) SaveMVC(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
+func (s *TodoService) SaveMVC(ctx context.Context, sessionID string, mvc *TodoMVC) error {
 	return s.saveMVCToDB(ctx, sessionID, mvc)
 }
 
 // ResetMVC resets the TodoMVC to its initial state.
-func (s *TodoService) ResetMVC(mvc *todocomponents.TodoMVC) {
+func (s *TodoService) ResetMVC(mvc *TodoMVC) {
 	s.resetMVC(mvc)
 }
 
 // ToggleTodo toggles the completion state of a todo by index.
-func (s *TodoService) ToggleTodo(mvc *todocomponents.TodoMVC, index int) {
+func (s *TodoService) ToggleTodo(mvc *TodoMVC, index int) {
 	if index < 0 {
 		setCompletedTo := false
 		for _, todo := range mvc.Todos {
@@ -129,11 +128,11 @@ func (s *TodoService) ToggleTodo(mvc *todocomponents.TodoMVC, index int) {
 }
 
 // EditTodo updates or creates a todo with the given text.
-func (s *TodoService) EditTodo(mvc *todocomponents.TodoMVC, index int, text string) {
+func (s *TodoService) EditTodo(mvc *TodoMVC, index int, text string) {
 	if index >= 0 && index < len(mvc.Todos) {
 		mvc.Todos[index].Text = text
 	} else if index < 0 {
-		mvc.Todos = append(mvc.Todos, &todocomponents.Todo{
+		mvc.Todos = append(mvc.Todos, &Todo{
 			Text:      text,
 			Completed: false,
 		})
@@ -142,32 +141,32 @@ func (s *TodoService) EditTodo(mvc *todocomponents.TodoMVC, index int, text stri
 }
 
 // DeleteTodo removes a todo by index or clears completed todos if index is -1.
-func (s *TodoService) DeleteTodo(mvc *todocomponents.TodoMVC, index int) {
+func (s *TodoService) DeleteTodo(mvc *TodoMVC, index int) {
 	if index >= 0 && index < len(mvc.Todos) {
 		mvc.Todos = append(mvc.Todos[:index], mvc.Todos[index+1:]...)
 	} else if index < 0 {
-		mvc.Todos = lo.Filter(mvc.Todos, func(todo *todocomponents.Todo, _ int) bool {
-			return !todo.Completed
+		mvc.Todos = lo.Filter(mvc.Todos, func(item *Todo, _ int) bool {
+			return !item.Completed
 		})
 	}
 }
 
 // SetMode changes the view filter mode for todos.
-func (s *TodoService) SetMode(mvc *todocomponents.TodoMVC, mode todocomponents.TodoViewMode) {
+func (s *TodoService) SetMode(mvc *TodoMVC, mode TodoViewMode) {
 	mvc.Mode = mode
 }
 
 // StartEditing puts a todo into edit mode.
-func (s *TodoService) StartEditing(mvc *todocomponents.TodoMVC, index int) {
+func (s *TodoService) StartEditing(mvc *TodoMVC, index int) {
 	mvc.EditingIdx = index
 }
 
 // CancelEditing exits edit mode without saving.
-func (s *TodoService) CancelEditing(mvc *todocomponents.TodoMVC) {
+func (s *TodoService) CancelEditing(mvc *TodoMVC) {
 	mvc.EditingIdx = -1
 }
 
-func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *todocomponents.TodoMVC) error {
+func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *TodoMVC) error {
 	// Delete all existing todos for this user
 	if err := s.todoRepo.DeleteAllTodosByUser(ctx, sessionID); err != nil {
 		return fmt.Errorf("failed to delete existing todos: %w", err)
@@ -204,9 +203,9 @@ func (s *TodoService) saveMVCToDB(ctx context.Context, sessionID string, mvc *to
 	return nil
 }
 
-func (s *TodoService) resetMVC(mvc *todocomponents.TodoMVC) {
-	mvc.Mode = todocomponents.TodoViewModeAll
-	mvc.Todos = []*todocomponents.Todo{
+func (s *TodoService) resetMVC(mvc *TodoMVC) {
+	mvc.Mode = TodoViewModeAll
+	mvc.Todos = []*Todo{
 		{Text: "Learn any backend language", Completed: true},
 		{Text: "Learn Datastar", Completed: false},
 		{Text: "Create Hypermedia", Completed: false},

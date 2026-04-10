@@ -1,67 +1,43 @@
-// Package todocomponents contains gomponents-based UI for the todo feature.
-package todocomponents
+// Package todo contains gomponents-based UI for the todo feature.
+package todo
 
 import (
 	"fmt"
-	"strings"
 
-	commoncomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/common/components"
 	appds "github.com/yacobolo/datastar-go-blueprint/internal/platform/ds"
+	"github.com/yacobolo/datastar-go-blueprint/internal/services"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui/core"
 
 	g "maragu.dev/gomponents"
 	data "maragu.dev/gomponents-datastar"
 	h "maragu.dev/gomponents/html"
 )
 
-// TodoViewMode controls which todos are visible in the list.
-type TodoViewMode int
+// ViewMode controls which todos are visible in the list.
+type ViewMode = services.TodoViewMode
 
 const (
-	// TodoViewModeAll shows every todo item.
-	TodoViewModeAll TodoViewMode = iota
-	// TodoViewModeActive shows only incomplete todos.
-	TodoViewModeActive
-	// TodoViewModeCompleted shows only completed todos.
-	TodoViewModeCompleted
-	// TodoViewModeLast marks the exclusive upper bound for view modes.
-	TodoViewModeLast
+	// ViewModeAll shows every todo item.
+	ViewModeAll = services.TodoViewModeAll
+	// ViewModeActive shows only incomplete todos.
+	ViewModeActive = services.TodoViewModeActive
+	// ViewModeCompleted shows only completed todos.
+	ViewModeCompleted = services.TodoViewModeCompleted
+	// ViewModeLast marks the exclusive upper bound for view modes.
+	ViewModeLast = services.TodoViewModeLast
 )
 
-// TodoViewModeStrings maps view modes to their UI labels.
-var TodoViewModeStrings = []string{"All", "Active", "Completed"}
+// ViewModeStrings maps view modes to their UI labels.
+var ViewModeStrings = services.TodoViewModeStrings
 
 // Todo is the UI representation of a single todo item.
-type Todo struct {
-	Text      string `json:"text"`
-	Completed bool   `json:"completed"`
-}
+type Todo = services.Todo
 
-// TodoMVC represents the full todo page state stored per session.
-type TodoMVC struct {
-	Todos      []*Todo      `json:"todos"`
-	EditingIdx int          `json:"editingIdx"`
-	Mode       TodoViewMode `json:"mode"`
-}
-
-func classNames(classes ...string) string {
-	filtered := make([]string, 0, len(classes))
-	for _, class := range classes {
-		if class != "" {
-			filtered = append(filtered, class)
-		}
-	}
-	return strings.Join(filtered, " ")
-}
-
-func when(condition bool, value string) string {
-	if condition {
-		return value
-	}
-	return ""
-}
+// MVC represents the full todo page state stored per session.
+type MVC = services.TodoMVC
 
 // TodosMVCView renders the main todo UI.
-func TodosMVCView(mvc *TodoMVC) g.Node {
+func TodosMVCView(mvc *MVC) g.Node {
 	hasTodos := len(mvc.Todos) > 0
 	left, completed := 0, 0
 	for _, todo := range mvc.Todos {
@@ -79,17 +55,17 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 
 	rows := make(g.Group, 0, len(mvc.Todos))
 	for i, todo := range mvc.Todos {
-		rows = append(rows, TodoRow(mvc.Mode, todo, i, i == mvc.EditingIdx))
+		rows = append(rows, Row(mvc.Mode, todo, i, i == mvc.EditingIdx))
 	}
 
-	modeButtons := make(g.Group, 0, int(TodoViewModeLast))
-	for i := TodoViewModeAll; i < TodoViewModeLast; i++ {
+	modeButtons := make(g.Group, 0, int(ViewModeLast))
+	for i := ViewModeAll; i < ViewModeLast; i++ {
 		if i == mvc.Mode {
 			modeButtons = append(modeButtons,
 				h.Button(
 					h.Type("button"),
 					h.Class("btn btn-sm join-item btn-primary"),
-					g.Text(TodoViewModeStrings[i]),
+					g.Text(ViewModeStrings[i]),
 				),
 			)
 			continue
@@ -100,7 +76,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 				h.Type("button"),
 				h.Class("btn btn-sm join-item"),
 				data.On("click", appds.Putf("/api/todos/mode/%d", i)),
-				g.Text(TodoViewModeStrings[i]),
+				g.Text(ViewModeStrings[i]),
 			),
 		)
 	}
@@ -114,7 +90,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 				h.Title(fmt.Sprintf("Clear %d completed todos", completed)),
 				g.Attr("aria-label", fmt.Sprintf("Clear %d completed todos", completed)),
 				data.On("click", appds.Delete("/api/todos/-1")),
-				commoncomponents.IconTrash(),
+				core.IconTrash(),
 			),
 		)
 	}
@@ -124,7 +100,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 			h.Class("btn btn-outline btn-sm"),
 			h.Title("Reset list"),
 			data.On("click", appds.Put("/api/todos/reset")),
-			commoncomponents.IconListChecks(),
+			core.IconListChecks(),
 			h.Span(g.Text("Reset")),
 		),
 	)
@@ -159,10 +135,10 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 							data.On("click", appds.Post("/api/todos/-1/toggle")),
 							data.Indicator("toggleAllFetching"),
 							data.Attr("disabled", "$toggleAllFetching"),
-							commoncomponents.IconListChecks(),
+							core.IconListChecks(),
 						)),
-						g.If(mvc.EditingIdx < 0, TodoInput(-1)),
-						commoncomponents.SseIndicator("toggleAllFetching"),
+						g.If(mvc.EditingIdx < 0, Input(-1)),
+						core.SseIndicator("toggleAllFetching"),
 					),
 				),
 				g.If(hasTodos, h.Section(
@@ -208,8 +184,8 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 	)
 }
 
-// TodoInput renders the add/edit input.
-func TodoInput(i int) g.Node {
+// Input renders the add/edit input.
+func Input(i int) g.Node {
 	expression := fmt.Sprintf(`
 			if (evt.key !== 'Enter' || !$input.trim().length) return;
 			%s;
@@ -227,10 +203,12 @@ func TodoInput(i int) g.Node {
 	)
 }
 
-// TodoRow renders a single todo row.
-func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
+// Row renders a single todo row.
+func Row(mode ViewMode, todo *Todo, i int, isEditing bool) g.Node {
 	indicatorID := fmt.Sprintf("indicator%d", i)
 	fetchingSignalName := fmt.Sprintf("fetching%d", i)
+	rowClass := "flex items-center gap-3 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-sm"
+	labelClass := "btn btn-ghost h-auto min-h-0 flex-1 justify-start px-3 py-2 text-left text-sm font-normal normal-case sm:text-base"
 
 	if isEditing {
 		return h.Li(
@@ -243,22 +221,24 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 					h.Span(h.Class("badge badge-primary badge-outline"), g.Text("Editing")),
 					h.Span(h.Class("text-xs text-base-content/60"), g.Text("Press Enter to save")),
 				),
-				TodoInput(i),
+				Input(i),
 			),
 		)
 	}
 
-	if mode != TodoViewModeAll &&
-		(mode != TodoViewModeActive || todo.Completed) &&
-		(mode != TodoViewModeCompleted || !todo.Completed) {
+	if mode != ViewModeAll &&
+		(mode != ViewModeActive || todo.Completed) &&
+		(mode != ViewModeCompleted || !todo.Completed) {
 		return nil
 	}
 
+	if todo.Completed {
+		rowClass += " opacity-70"
+		labelClass += " line-through text-base-content/50"
+	}
+
 	return h.Li(
-		h.Class(classNames(
-			"flex items-center gap-3 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-sm",
-			when(todo.Completed, "opacity-70"),
-		)),
+		h.Class(rowClass),
 		h.ID(fmt.Sprintf("todo%d", i)),
 		h.Button(
 			h.ID(fmt.Sprintf("toggle%d", i)),
@@ -275,15 +255,12 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 				),
 			),
 			data.Indicator(fetchingSignalName),
-			commoncomponents.IconCheckbox(todo.Completed),
+			core.IconCheckbox(todo.Completed),
 		),
 		h.Button(
 			h.ID(indicatorID),
 			h.Type("button"),
-			h.Class(classNames(
-				"btn btn-ghost h-auto min-h-0 flex-1 justify-start px-3 py-2 text-left text-sm font-normal normal-case sm:text-base",
-				when(todo.Completed, "line-through text-base-content/50"),
-			)),
+			h.Class(labelClass),
 			h.Title("Edit todo"),
 			data.On("click", appds.Getf("/api/todos/%d/edit", i)),
 			data.On(
@@ -296,7 +273,7 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 			data.Indicator(fetchingSignalName),
 			g.Text(todo.Text),
 		),
-		commoncomponents.SseIndicator(fetchingSignalName),
+		core.SseIndicator(fetchingSignalName),
 		h.Button(
 			h.ID(fmt.Sprintf("delete%d", i)),
 			h.Type("button"),
@@ -307,7 +284,7 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 			data.Indicator(fetchingSignalName),
 			data.Attr("disabled", fmt.Sprintf("$%s", fetchingSignalName)),
 			g.Attr("data-testid", fmt.Sprintf("delete_todo%d", i)),
-			commoncomponents.IconClose(),
+			core.IconClose(),
 		),
 	)
 }

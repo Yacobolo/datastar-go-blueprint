@@ -8,7 +8,7 @@ import (
 
 	"github.com/yacobolo/datastar-go-blueprint/internal/app"
 	"github.com/yacobolo/datastar-go-blueprint/internal/config"
-	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui/todo"
 	"github.com/yacobolo/datastar-go-blueprint/web/resources"
 
 	"github.com/go-chi/chi/v5"

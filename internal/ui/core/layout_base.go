@@ -1,9 +1,8 @@
-// Package layouts provides shared page layout nodes for gomponents views.
-package layouts
+// Package core provides shared page layout nodes and UI building blocks.
+package core
 
 import (
 	"github.com/yacobolo/datastar-go-blueprint/internal/config"
-	"github.com/yacobolo/datastar-go-blueprint/internal/features/common/components"
 	appds "github.com/yacobolo/datastar-go-blueprint/internal/platform/ds"
 	"github.com/yacobolo/datastar-go-blueprint/web/resources"
 
@@ -55,13 +54,13 @@ func Base(title string, children ...g.Node) g.Node {
 			),
 			h.Div(
 				h.Class("drawer-content flex min-h-screen flex-col"),
-				components.Header(title),
+				Header(title),
 				h.Main(
 					h.Class("mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 p-4 sm:p-6"),
 					g.Group(children),
 				),
 			),
-			components.Sidebar(),
+			Sidebar(),
 		),
 	)
 
