@@ -38,15 +38,14 @@ task check
 # Full production build (with code generation + asset bundling)
 task build
 
-# Development mode (hot reload with Air, Templ watcher, esbuild)
+# Development mode (hot reload with Air and esbuild)
 task dev
 
 # Stop development processes
 task dev:stop
 
 # Code generation only
-task generate:all       # All generators (sqlc, templ, cssgen)
-task generate:templ     # Generate templ templates
+task generate:all       # All generators (sqlc, cssgen)
 task generate:sqlc      # Generate type-safe DB queries
 task generate:css       # Generate type-safe CSS constants
 ```
@@ -80,7 +79,10 @@ import (
 ```
 
 Use import aliases for clarity:
-- `ds "github.com/Yacobolo/datastar-templ"` - Datastar attributes in templ files
+- Dot imports are acceptable for gomponents packages in UI files:
+  - `. "maragu.dev/gomponents"`
+  - `. "maragu.dev/gomponents/html"`
+- `data "maragu.dev/gomponents-datastar"` - Datastar attributes in gomponents views
 - Package aliases to avoid conflicts: `commoncomponents`, `todocomponents`
 
 ### Naming Conventions
@@ -257,8 +259,8 @@ Organize code by feature (vertical slices), not layer:
 
 ```
 internal/features/todo/
-├── components/        # UI components (templ)
-├── pages/             # Full page layouts (templ)
+├── components/        # UI components (gomponents)
+├── pages/             # Full page layouts (gomponents)
 ├── services/          # Business logic
 ├── handlers.go        # HTTP handlers
 └── routes.go          # Route registration
@@ -331,57 +333,62 @@ func (h *Handlers) ToggleTodo(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### Templ Component Patterns
+### Gomponents Component Patterns
 
 **Type-safe CSS classes from generated constants:**
 ```go
-class={ ui.Btn, ui.BtnLg, ui.BtnPrimary }
+Button(
+    Class(ui.Btn + " " + ui.BtnLg + " " + ui.BtnPrimary),
+    Text("Save"),
+)
 ```
 
-**Datastar attributes (import as `ds`):**
+**Datastar attributes (import as `data`):**
 ```go
-import ds "github.com/Yacobolo/datastar-templ"
+import (
+    . "maragu.dev/gomponents"
+    . "maragu.dev/gomponents/html"
+    data "maragu.dev/gomponents-datastar"
+)
 
 // Signals
-{ ds.Signals(ds.String("input", input))... }
-{ ds.Bind("input")... }
+data.Signals(map[string]any{"input": input})
+data.Bind("input")
 
 // Events
-{ ds.OnClick(ds.Post("/api/todos/%d/toggle", i))... }
-{ ds.OnKeyDown(...)... }
+data.On("click", "@post('/api/todos/1/toggle')")
+data.On("keydown", "if (evt.key === 'Enter') { ... }")
 
 // HTTP methods
-{ ds.Get("/api/todos/updates")... }
-{ ds.Post("/api/todos/%d", i)... }
-{ ds.Put("/api/todos/reset")... }
-{ ds.Delete("/api/todos/%d", i)... }
+data.Init("@get('/api/todos/updates')")
+data.On("click", "@post('/api/todos/1')")
+data.On("click", "@put('/api/todos/reset')")
+data.On("click", "@delete('/api/todos/1')")
 
 // Conditional rendering
-{ ds.Show("$theme === 'light'")... }
+data.Show("$theme === 'light'")
 ```
 
 **Component composition:**
 ```go
-templ Base(title string) {
-    <body>
-        { children... }  // Child content injection
-    </body>
+func Base(title string, children ...Node) Node {
+    return Body(
+        Group(children),
+    )
 }
 
 // Usage
-@layouts.Base("My Page") {
-    <div>Content here</div>
-}
+layouts.Base("My Page", Div(Text("Content here")))
 ```
 
 ## Development Workflow
 
 ### When modifying files:
 
-**Templ files** (`.templ`):
-- Generate with `task generate:templ` or `templ generate`
-- Auto-watched in dev mode (`task dev`)
-- Creates `*_templ.go` files (don't edit these)
+**Gomponents view files** (`.go`):
+- Author views directly in Go; there is no template code generation step
+- Auto-rebuilt in dev mode via `task dev` and Air
+- Shared rendering helpers live in `internal/platform/render`
 
 **SQL queries** (`internal/store/queries/*.sql`):
 - Generate with `task generate:sqlc` or `sqlc generate`
@@ -390,7 +397,7 @@ templ Base(title string) {
 **CSS files** (`web/ui/styles/**/*.css`):
 - Generate with `task generate:css`
 - Creates type-safe constants in `internal/ui/styles*.gen.go`
-- Use constants in templ: `class={ ui.Btn }`
+- Use constants in gomponents: `Class(ui.Btn)`
 
 **Migrations** (`internal/store/migrations/*.sql`):
 - Name format: `NNN_description.sql`

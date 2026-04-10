@@ -8,7 +8,7 @@ env:
   CSSGEN_OUTPUT_DIR: internal/ui
   CSSGEN_PACKAGE: ui
   CSSGEN_INCLUDE: "layers/components/**/*.css,layers/utilities.css,layers/base.css"
-  CSSGEN_LINT_PATHS: "internal/features/**/*.templ,internal/features/**/*.go"
+  CSSGEN_LINT_PATHS: "internal/features/**/*.go"
 
 tasks:
   default:
@@ -20,19 +20,9 @@ tasks:
   # Code Generation (generate:*)
   # ====================
   # These tasks generate Go code from source files:
-  # - generate:templ : *.templ → *_templ.go
   # - generate:sqlc  : *.sql → type-safe queries
   # - generate:css   : *.css → type-safe constants
   # ====================
-
-  generate:templ:
-    desc: Generate templ templates
-    sources:
-      - internal/features/**/*.templ
-    generates:
-      - internal/features/**/*_templ.go
-    cmds:
-      - templ generate
 
   # ====================
   # Asset Bundling (build:web:*)
@@ -94,11 +84,10 @@ tasks:
   # ====================
 
   generate:all:
-    desc: Run all code generators (sqlc, cssgen, templ)
+    desc: Run all code generators (sqlc, cssgen)
     deps:
       - generate:sqlc
       - generate:css
-      - generate:templ
 
   generate:sqlc:
     desc: Generate type-safe database code from SQL
@@ -177,7 +166,6 @@ tasks:
       - rm -rf bin/
       - rm -rf tmp/
       - rm -rf web/resources/static/*
-      - find . -name '*_templ.go' -delete
       - rm -f internal/ui/styles*.gen.go
 
   # ====================
@@ -187,7 +175,6 @@ tasks:
   tools:install:
     desc: Install development tools
     cmds:
-      - go install github.com/a-h/templ/cmd/templ@latest
       - go install github.com/air-verse/air@latest
       - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -199,7 +186,7 @@ tasks:
     desc: Check if required tools are installed
     cmds:
       - |
-        for tool in templ air sqlc golangci-lint cssgen hivemind gotestsum; do
+        for tool in air sqlc golangci-lint cssgen hivemind gotestsum; do
           if command -v $tool &> /dev/null; then
             echo "✓ $tool installed"
           else

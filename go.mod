@@ -8,7 +8,6 @@ require (
 )
 
 require (
-	github.com/a-h/templ v0.3.977
 	github.com/benbjohnson/hashfs v0.2.2
 	github.com/evanw/esbuild v0.27.2
 	github.com/google/uuid v1.6.0
@@ -19,6 +18,8 @@ require (
 	github.com/pressly/goose/v3 v3.26.0
 	github.com/samber/lo v1.52.0
 	github.com/starfederation/datastar-go v1.1.0
+	maragu.dev/gomponents v1.2.0
+	maragu.dev/gomponents-datastar v0.3.3
 	modernc.org/sqlite v1.41.0
 )
 
@@ -31,8 +32,6 @@ require (
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.5 // indirect
-	github.com/Yacobolo/datastar-templ v1.2.0 // indirect
-	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/air-verse/air v1.61.7 // indirect
 	github.com/alecthomas/chroma/v2 v2.15.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
@@ -41,10 +40,8 @@ require (
 	github.com/bep/godartsass v1.2.0 // indirect
 	github.com/bep/godartsass/v2 v2.1.0 // indirect
 	github.com/bep/golibsass v1.2.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/chainguard-dev/git-urls v1.0.2 // indirect
 	github.com/cilium/ebpf v0.11.0 // indirect
-	github.com/cli/browser v1.3.0 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/cosiner/argv v0.1.0 // indirect
@@ -96,7 +93,6 @@ require (
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/minio/highwayhash v1.0.4-0.20251030100505-070ab1a87a76 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
-	github.com/natefinch/atomic v1.0.1 // indirect
 	github.com/nats-io/jwt/v2 v2.8.0 // indirect
 	github.com/nats-io/nkeys v0.4.12 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
@@ -141,14 +137,12 @@ require (
 	golang.org/x/crypto v0.47.0 // indirect
 	golang.org/x/exp v0.0.0-20251209150349-8475f28825e9 // indirect
 	golang.org/x/image v0.25.0 // indirect
-	golang.org/x/mod v0.31.0 // indirect
 	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/telemetry v0.0.0-20251203150158-8fff8a5912fc // indirect
 	golang.org/x/term v0.39.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251022142026-3a174f9686a8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/grpc v1.77.0 // indirect
@@ -163,7 +157,6 @@ require (
 )
 
 tool (
-	github.com/a-h/templ/cmd/templ
 	github.com/air-verse/air
 	github.com/go-delve/delve/cmd/dlv
 	github.com/go-task/task/v3/cmd/task

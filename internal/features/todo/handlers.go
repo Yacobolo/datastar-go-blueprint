@@ -12,6 +12,7 @@ import (
 	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/pages"
 	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/services"
 	"github.com/yacobolo/datastar-go-blueprint/internal/platform/pubsub"
+	"github.com/yacobolo/datastar-go-blueprint/internal/platform/render"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -81,8 +82,8 @@ func subject(sessionID string) string {
 }
 
 // IndexPage renders the initial page
-func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
-	if err := pages.IndexPage("Datastar Go Blueprint").Render(r.Context(), w); err != nil {
+func (h *Handlers) IndexPage(w http.ResponseWriter, _ *http.Request) {
+	if err := render.HTML(w, pages.IndexPage("Datastar Go Blueprint")); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
@@ -135,7 +136,8 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 			// Send toast if present
 			if updateMsg.Toast != nil {
 				toastComponent := commoncomponents.Toast(updateMsg.Toast.Message, updateMsg.Toast.Type)
-				if err := sse.PatchElementTempl(
+				if err := render.PatchSSE(
+					sse,
 					toastComponent,
 					datastar.WithSelectorID("toast-container"),
 					datastar.WithModeAppend(),
@@ -155,7 +157,7 @@ func (h *Handlers) refreshTodos(ctx context.Context, sse *datastar.ServerSentEve
 		return err
 	}
 
-	return sse.PatchElementTempl(todocomponents.TodosMVCView(mvc))
+	return render.PatchSSE(sse, todocomponents.TodosMVCView(mvc))
 }
 
 // notifyUpdate publishes a NATS message to trigger UI refresh
