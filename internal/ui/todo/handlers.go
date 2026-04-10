@@ -20,8 +20,8 @@ import (
 )
 
 // RequireSession retrieves or creates a session ID for the current request.
-func RequireSession(store sessions.Store, w http.ResponseWriter, r *http.Request) (string, bool) {
-	sess, err := store.Get(r, "connections")
+func RequireSession(store sessions.Store, sessionName string, w http.ResponseWriter, r *http.Request) (string, bool) {
+	sess, err := store.Get(r, sessionName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return "", false
@@ -61,15 +61,17 @@ type Handlers struct {
 	logger       *slog.Logger
 	todoService  *services.TodoService
 	nats         *nats.Conn
+	sessionName  string
 	sessionStore sessions.Store
 }
 
 // NewHandlers creates a new Handlers instance with the given dependencies.
-func NewHandlers(logger *slog.Logger, todoService *services.TodoService, nats *nats.Conn, sessionStore sessions.Store) *Handlers {
+func NewHandlers(logger *slog.Logger, todoService *services.TodoService, nats *nats.Conn, sessionStore sessions.Store, sessionName string) *Handlers {
 	return &Handlers{
 		logger:       logger,
 		todoService:  todoService,
 		nats:         nats,
+		sessionName:  sessionName,
 		sessionStore: sessionStore,
 	}
 }
@@ -88,7 +90,7 @@ func (h *Handlers) IndexPage(w http.ResponseWriter, _ *http.Request) {
 
 // TodosUpdates is the long-running SSE endpoint that pushes real-time updates
 func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -167,7 +169,7 @@ func (h *Handlers) notifyUpdate(sessionID string, opts ...pubsub.NotifyOption) {
 
 // ResetTodos resets to default todos
 func (h *Handlers) ResetTodos(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -194,7 +196,7 @@ func (h *Handlers) ResetTodos(w http.ResponseWriter, r *http.Request) {
 
 // CancelEdit cancels editing mode
 func (h *Handlers) CancelEdit(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -217,7 +219,7 @@ func (h *Handlers) CancelEdit(w http.ResponseWriter, r *http.Request) {
 
 // SetMode changes the view filter mode
 func (h *Handlers) SetMode(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -253,7 +255,7 @@ func (h *Handlers) SetMode(w http.ResponseWriter, r *http.Request) {
 
 // ToggleTodo toggles completion state
 func (h *Handlers) ToggleTodo(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -281,7 +283,7 @@ func (h *Handlers) ToggleTodo(w http.ResponseWriter, r *http.Request) {
 
 // StartEdit enters edit mode for a todo
 func (h *Handlers) StartEdit(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -323,7 +325,7 @@ func (h *Handlers) SaveEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}
@@ -359,7 +361,7 @@ func (h *Handlers) SaveEdit(w http.ResponseWriter, r *http.Request) {
 
 // DeleteTodo removes a todo
 func (h *Handlers) DeleteTodo(w http.ResponseWriter, r *http.Request) {
-	sessionID, ok := RequireSession(h.sessionStore, w, r)
+	sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
 	if !ok {
 		return
 	}

@@ -4,6 +4,7 @@ package config
 import (
 	"log/slog"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -24,8 +25,10 @@ type Config struct {
 	Environment   Environment
 	Host          string
 	Port          string
+	NATSPort      int
 	DBPath        string
 	LogLevel      slog.Level
+	SessionName   string
 	SessionSecret string
 }
 
@@ -48,13 +51,24 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
+func getEnvInt(key string, fallback int) int {
+	if val, ok := os.LookupEnv(key); ok {
+		parsed, err := strconv.Atoi(val)
+		if err == nil {
+			return parsed
+		}
+	}
+	return fallback
+}
+
 func loadBase() *Config {
 	_ = godotenv.Load()
 
 	return &Config{
-		Host:   getEnv("HOST", "0.0.0.0"),
-		Port:   getEnv("PORT", "8080"),
-		DBPath: getEnv("DB_PATH", "./data/todos.db"),
+		Host:     getEnv("HOST", "0.0.0.0"),
+		Port:     getEnv("PORT", "8080"),
+		NATSPort: getEnvInt("NATS_PORT", 4222),
+		DBPath:   getEnv("DB_PATH", "./data/todos.db"),
 		LogLevel: func() slog.Level {
 			switch os.Getenv("LOG_LEVEL") {
 			case "DEBUG":
@@ -69,6 +83,7 @@ func loadBase() *Config {
 				return slog.LevelInfo
 			}
 		}(),
+		SessionName:   getEnv("SESSION_NAME", "connections"),
 		SessionSecret: getEnv("SESSION_SECRET", "session-secret"),
 	}
 }

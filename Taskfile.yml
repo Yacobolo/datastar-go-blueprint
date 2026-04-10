@@ -1,7 +1,6 @@
 version: "3"
 
 env:
-  PORT: 8080  # Default to 8080 to avoid macOS ControlCenter conflict on port 5000
   STATIC_DIR: web/resources/static
 
 tasks:
@@ -29,7 +28,7 @@ tasks:
       - web/ui/styles/main.css
       - web/package.json
       - web/pnpm-lock.yaml
-      - internal/features/**/*.go
+      - internal/ui/**/*.go
       - web/ui/components/**/*.ts
       - web/ui/src/**/*.ts
     generates:
@@ -72,12 +71,31 @@ tasks:
   # ====================
 
   dev:
-    desc: Start development with Procfile (all watchers in parallel)
+    desc: Start development with worktree-specific ports and state
     deps:
       - generate:all
       - build:web:assets
     cmds:
-      - hivemind Procfile.dev
+      - |
+        worktree_path="$(pwd -P)"
+        checksum="$(printf '%s' "$worktree_path" | cksum | awk '{print $1}')"
+        offset=$((checksum % 1000))
+
+        mkdir -p ./.codex/dev
+
+        export PORT="${PORT:-$((8080 + offset))}"
+        export NATS_PORT="${NATS_PORT:-$((4222 + offset))}"
+        export DB_PATH="${DB_PATH:-./.codex/dev/todos_${offset}.db}"
+        export SESSION_NAME="${SESSION_NAME:-connections_${offset}}"
+        export SESSION_SECRET="${SESSION_SECRET:-dev-session-${checksum}}"
+
+        echo "Starting dev environment for ${worktree_path}"
+        echo "  App URL:        http://localhost:${PORT}"
+        echo "  NATS URL:       nats://localhost:${NATS_PORT}"
+        echo "  SQLite DB:      ${DB_PATH}"
+        echo "  Session cookie: ${SESSION_NAME}"
+
+        hivemind Procfile.dev
 
   dev:stop:
     desc: Stop running development processes
