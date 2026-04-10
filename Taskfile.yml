@@ -3,12 +3,6 @@ version: "3"
 env:
   PORT: 8080  # Default to 8080 to avoid macOS ControlCenter conflict on port 5000
   STATIC_DIR: web/resources/static
-  # cssgen common parameters
-  CSSGEN_SOURCE: web/ui/styles
-  CSSGEN_OUTPUT_DIR: internal/ui
-  CSSGEN_PACKAGE: ui
-  CSSGEN_INCLUDE: "layers/components/**/*.css,layers/utilities.css,layers/base.css"
-  CSSGEN_LINT_PATHS: "internal/features/**/*.templ,internal/features/**/*.go"
 
 tasks:
   default:
@@ -20,19 +14,8 @@ tasks:
   # Code Generation (generate:*)
   # ====================
   # These tasks generate Go code from source files:
-  # - generate:templ : *.templ → *_templ.go
   # - generate:sqlc  : *.sql → type-safe queries
-  # - generate:css   : *.css → type-safe constants
   # ====================
-
-  generate:templ:
-    desc: Generate templ templates
-    sources:
-      - internal/features/**/*.templ
-    generates:
-      - internal/features/**/*_templ.go
-    cmds:
-      - templ generate
 
   # ====================
   # Asset Bundling (build:web:*)
@@ -40,19 +23,37 @@ tasks:
   # These tasks bundle frontend assets for deployment
   # ====================
 
-  build:web:assets:
-    desc: Bundle all web assets (CSS + JS/TS) with esbuild
+  build:web:css:
+    desc: Build Tailwind + DaisyUI CSS
     sources:
-      - web/ui/styles/**/*.css
+      - web/ui/styles/main.css
+      - web/package.json
+      - web/pnpm-lock.yaml
+      - internal/features/**/*.go
+      - web/ui/components/**/*.ts
+      - web/ui/src/**/*.ts
+    generates:
+      - web/resources/static/styles.css
+    cmds:
+      - pnpm --dir web exec tailwindcss -i ./ui/styles/main.css -o ./resources/static/styles.css --minify
+
+  build:web:js:
+    desc: Bundle frontend JavaScript with esbuild
+    sources:
       - web/ui/components/**/*.ts
       - web/ui/libs/**/*.ts
       - web/ui/src/**/*.ts
     generates:
-      - web/resources/static/styles.css
       - web/resources/static/libs/*.js
       - web/resources/static/theme-switcher.js
     cmds:
       - go run -tags=dev cmd/server/build/main.go
+
+  build:web:assets:
+    desc: Bundle all web assets (Tailwind CSS + JS/TS)
+    deps:
+      - build:web:css
+      - build:web:js
 
   # ====================
   # Production Build
@@ -94,11 +95,9 @@ tasks:
   # ====================
 
   generate:all:
-    desc: Run all code generators (sqlc, cssgen, templ)
+    desc: Run all code generators (sqlc)
     deps:
       - generate:sqlc
-      - generate:css
-      - generate:templ
 
   generate:sqlc:
     desc: Generate type-safe database code from SQL
@@ -109,24 +108,6 @@ tasks:
       - internal/store/queries/*.go
     cmds:
       - sqlc generate
-
-  generate:css:
-    desc: Generate type-safe CSS constants from CSS files
-    sources:
-      - web/ui/styles/**/*.css
-    generates:
-      - internal/ui/styles*.gen.go
-    cmds:
-      - cssgen -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}"
-
-  # ====================
-  # CSS Linting
-  # ====================
-
-  css:lint:
-    desc: Lint CSS usage (golangci-lint style - issues only)
-    cmds:
-      - cssgen -lint-only -source ${CSSGEN_SOURCE} -output-dir ${CSSGEN_OUTPUT_DIR} -package ${CSSGEN_PACKAGE} -include "${CSSGEN_INCLUDE}" -lint-paths "${CSSGEN_LINT_PATHS}"
 
   # ====================
   # Database Commands
@@ -159,13 +140,19 @@ tasks:
     cmds:
       - golangci-lint run
 
+  check:web:types:
+    desc: Type-check frontend TypeScript
+    cmds:
+      - pnpm --dir web run build
+
   check:
-    desc: Run tests, lint, and CSS lint (shows all errors)
+    desc: Run tests, lint, and asset builds (shows all errors)
     ignore_error: true
     cmds:
       - task: test
       - task: lint
-      - task: css:lint
+      - task: check:web:types
+      - task: build:web:assets
 
   # ====================
   # Cleanup
@@ -177,8 +164,6 @@ tasks:
       - rm -rf bin/
       - rm -rf tmp/
       - rm -rf web/resources/static/*
-      - find . -name '*_templ.go' -delete
-      - rm -f internal/ui/styles*.gen.go
 
   # ====================
   # Tools Installation
@@ -187,11 +172,9 @@ tasks:
   tools:install:
     desc: Install development tools
     cmds:
-      - go install github.com/a-h/templ/cmd/templ@latest
       - go install github.com/air-verse/air@latest
       - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-      - go install github.com/yacobolo/cssgen/cmd/cssgen@latest
       - go install github.com/DarthSim/hivemind@latest
       - go install gotest.tools/gotestsum@latest
 
@@ -199,7 +182,7 @@ tasks:
     desc: Check if required tools are installed
     cmds:
       - |
-        for tool in templ air sqlc golangci-lint cssgen hivemind gotestsum; do
+        for tool in air sqlc golangci-lint hivemind gotestsum pnpm; do
           if command -v $tool &> /dev/null; then
             echo "✓ $tool installed"
           else

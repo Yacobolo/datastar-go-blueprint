@@ -58,10 +58,6 @@ func build(ctx context.Context) error {
 				InputPath:  "web/ui/src/plugins/theme-switcher.ts",
 				OutputPath: "theme-switcher",
 			},
-			{
-				InputPath:  "web/ui/styles/main.css",
-				OutputPath: "styles",
-			},
 		},
 		Bundle:            true,
 		Format:            api.FormatESModule,

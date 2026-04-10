@@ -1,13 +1,13 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { Todo } from './types';
 
 /**
  * A Lit web component for rendering a TODO table.
  * Demonstrates integration with Datastar for reactive updates.
- * 
+ *
  * Usage:
- * <todo-table 
+ * <todo-table
  *   data-bind-todos="$todos"
  *   data-bind-mode="$mode">
  * </todo-table>
@@ -16,87 +16,10 @@ import type { Todo } from './types';
 export class TodoTable extends LitElement {
   @property({ type: Array }) todos: Todo[] = [];
   @property({ type: String }) mode: 'all' | 'active' | 'completed' = 'all';
-  
-  static styles = css`
-    :host {
-      display: block;
-    }
 
-    .todo-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--ui-space-sm);
-    }
-
-    .todo-item {
-      display: flex;
-      align-items: center;
-      gap: var(--ui-space-md);
-      padding: var(--ui-space-md);
-      background: var(--ui-color-surface);
-      border: var(--ui-border-md) solid var(--ui-color-outline);
-      border-radius: var(--ui-radius-md);
-      transition: background var(--ui-duration-fast) var(--ui-ease-default);
-    }
-
-    .todo-item:hover {
-      background: var(--ui-color-surface-variant);
-    }
-
-    .todo-item.completed {
-      opacity: 0.6;
-    }
-
-    .todo-checkbox {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
-
-    .todo-task {
-      flex: 1;
-      font-size: var(--ui-type-size-base);
-      color: var(--ui-color-on-surface);
-    }
-
-    .todo-task.completed {
-      text-decoration: line-through;
-    }
-
-    .todo-actions {
-      display: flex;
-      gap: var(--ui-space-sm);
-    }
-
-    .btn {
-      padding: var(--ui-space-xs) var(--ui-space-sm);
-      font-size: var(--ui-type-size-xs);
-      border: none;
-      border-radius: var(--ui-radius-md);
-      cursor: pointer;
-      transition: opacity var(--ui-duration-fast);
-    }
-
-    .btn:hover {
-      opacity: 0.8;
-    }
-
-    .btn-error {
-      background: var(--ui-color-error);
-      color: var(--ui-color-on-error);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--ui-color-on-background);
-    }
-
-    .empty-state {
-      padding: var(--ui-space-xl);
-      text-align: center;
-      color: var(--ui-color-on-surface-variant);
-    }
-  `;
+  override createRenderRoot() {
+    return this;
+  }
 
   get filteredTodos() {
     switch (this.mode) {
@@ -114,16 +37,18 @@ export class TodoTable extends LitElement {
 
     if (filtered.length === 0) {
       return html`
-        <div class="empty-state">
-          ${this.mode === 'all' 
-            ? 'No todos yet. Add one to get started!' 
-            : `No ${this.mode} todos.`}
+        <div class="alert alert-info shadow-sm">
+          <span>
+            ${this.mode === 'all'
+              ? 'No todos yet. Add one to get started!'
+              : `No ${this.mode} todos.`}
+          </span>
         </div>
       `;
     }
 
     return html`
-      <div class="todo-list">
+      <div class="space-y-3">
         ${filtered.map((todo, index) => this.renderTodoItem(todo, index))}
       </div>
     `;
@@ -131,26 +56,32 @@ export class TodoTable extends LitElement {
 
   renderTodoItem(todo: Todo, index: number) {
     return html`
-      <div class="todo-item ${todo.completed ? 'completed' : ''}">
-        <input
-          type="checkbox"
-          class="todo-checkbox"
-          .checked=${todo.completed}
-          data-on-change="$$post('/api/todos/${index}/toggle')"
-        />
-        <span class="todo-task ${todo.completed ? 'completed' : ''}">
+      <div class="flex items-center gap-3 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-sm ${todo.completed ? 'opacity-70' : ''}">
+        <button
+          class="btn btn-ghost btn-sm btn-circle"
+          type="button"
+          aria-label="Toggle todo"
+          data-on-click="@post('/api/todos/${index}/toggle')"
+        >
+          <span class="${todo.completed ? 'text-primary' : 'text-base-content/50'}">
+            ${todo.completed ? '☑' : '☐'}
+          </span>
+        </button>
+        <span class="flex-1 text-sm sm:text-base ${todo.completed ? 'line-through text-base-content/50' : ''}">
           ${todo.task}
         </span>
-        <div class="todo-actions">
+        <div class="flex items-center gap-2">
           <button
-            class="btn btn-ghost"
-            data-on-click="$$post('/api/todos/${index}/start-edit')"
+            class="btn btn-ghost btn-xs"
+            type="button"
+            data-on-click="@get('/api/todos/${index}/edit')"
           >
             Edit
           </button>
           <button
-            class="btn btn-error"
-            data-on-click="$$delete('/api/todos/${index}')"
+            class="btn btn-ghost btn-xs text-error"
+            type="button"
+            data-on-click="@delete('/api/todos/${index}')"
           >
             Delete
           </button>

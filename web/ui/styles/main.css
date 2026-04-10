@@ -1,17 +1,9 @@
-/* Import design tokens first */
-@import url('./layers/tokens/index.css');
+@import "tailwindcss";
 
-/* Import all CSS files (esbuild will bundle and resolve) */
-@import './layers/base.css';
-@import './layers/components/app-shell.css';
-@import './layers/components/sidebar.css';
-@import './layers/components/header.css';
-@import './layers/components/button.css';
-@import './layers/components/input.css';
-@import './layers/components/callout.css';
-@import './layers/components/loading.css';
-@import './layers/components/todo.css';
-@import './layers/utilities.css';
+@source "../../../internal/**/*.go";
+@source "../components/**/*.ts";
+@source "../src/**/*.ts";
 
-/* Define layer order (must come after @import rules) */
-@layer base, components, utilities;
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}

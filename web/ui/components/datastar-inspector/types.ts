@@ -17,10 +17,6 @@ export interface InspectorState {
   filter: string
   /** Current view mode */
   viewMode: ViewMode
-  /** Panel width in pixels */
-  panelWidth?: number
-  /** Panel height in pixels */
-  panelHeight?: number
 }
 
 /**
