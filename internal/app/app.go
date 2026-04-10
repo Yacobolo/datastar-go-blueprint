@@ -34,6 +34,7 @@ type Services struct {
 type App struct {
 	Logger       *slog.Logger
 	Store        *store.SQLiteStore
+	SessionName  string
 	SessionStore sessions.Store
 	NATS         *nats.Conn
 	NATSServer   *embeddednats.Server
@@ -59,7 +60,7 @@ func New(cfg *config.Config, logger *slog.Logger) (*App, error) {
 	// 2. Start embedded NATS server
 	natsOpts := &embeddednats.Options{
 		Host:      "localhost",
-		Port:      4222,
+		Port:      cfg.NATSPort,
 		JetStream: true,
 	}
 	ns, err := embeddednats.NewServer(natsOpts)
@@ -99,12 +100,13 @@ func New(cfg *config.Config, logger *slog.Logger) (*App, error) {
 	// 6. Create services (application layer)
 	// Services depend on domain interfaces, not concrete implementations
 	svc := &Services{
-		Todo: services.NewTodoService(repos.Todos, repos.Sessions, sessionStore),
+		Todo: services.NewTodoService(repos.Todos, repos.Sessions, sessionStore, cfg.SessionName),
 	}
 
 	return &App{
 		Logger:       logger,
 		Store:        dbStore,
+		SessionName:  cfg.SessionName,
 		SessionStore: sessionStore,
 		NATS:         nc,
 		NATSServer:   ns,

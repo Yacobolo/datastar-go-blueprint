@@ -14,6 +14,7 @@ func SetupRoutes(router chi.Router, application *app.App) error {
 		application.Services.Todo,
 		application.NATS,
 		application.SessionStore,
+		application.SessionName,
 	)
 
 	router.Get("/", handlers.IndexPage)
