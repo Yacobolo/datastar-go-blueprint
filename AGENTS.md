@@ -226,9 +226,10 @@ func NewTodoRepository(st *SQLiteStore) *TodoRepository {
 type TodoService struct {
     todoRepo    domain.TodoRepository    // Depend on interfaces
     sessionRepo domain.SessionRepository
+    sessionName string
 }
 
-func NewTodoService(todoRepo domain.TodoRepository, ...) *TodoService {
+func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRepository, store sessions.Store, sessionName string) *TodoService {
     return &TodoService{todoRepo: todoRepo, ...}
 }
 ```
@@ -238,9 +239,10 @@ func NewTodoService(todoRepo domain.TodoRepository, ...) *TodoService {
 type Handlers struct {
     logger      *slog.Logger
     todoService *services.TodoService
+    sessionName string
 }
 
-func NewHandlers(logger *slog.Logger, svc *services.TodoService, ...) *Handlers {
+func NewHandlers(logger *slog.Logger, svc *services.TodoService, nats *nats.Conn, sessionStore sessions.Store, sessionName string) *Handlers {
     return &Handlers{logger: logger, todoService: svc, ...}
 }
 
@@ -269,6 +271,16 @@ internal/ui/todo/
 internal/services/
 └── todo_service.go
 ```
+
+### Parallel dev worktrees
+`task dev` computes worktree-specific development settings so multiple local worktrees do not collide:
+- `PORT`
+- `NATS_PORT`
+- `DB_PATH`
+- `SESSION_NAME`
+- `SESSION_SECRET`
+
+Use the URL printed by `task dev` instead of assuming `http://localhost:8080`.
 
 ### Database Patterns
 
@@ -305,7 +317,7 @@ Standard flow: Extract params → Get session → Call service → Notify → Re
 ```go
 func (h *Handlers) ToggleTodo(w http.ResponseWriter, r *http.Request) {
     // 1. Get session
-    sessionID, ok := RequireSession(h.sessionStore, w, r)
+    sessionID, ok := RequireSession(h.sessionStore, h.sessionName, w, r)
     if !ok {
         return
     }
@@ -393,6 +405,8 @@ layouts.Base("My Page", Div(Text("Content here")))
 - Author views directly in Go; there is no template code generation step
 - Auto-rebuilt in dev mode via `task dev` and Air
 - Shared rendering helpers live in `internal/platform/render`
+
+`task dev` uses worktree-specific ports, NATS state, SQLite DB files, and cookie names so parallel worktrees can run side by side.
 
 **SQL queries** (`internal/store/queries/*.sql`):
 - Generate with `task generate:sqlc` or `sqlc generate`

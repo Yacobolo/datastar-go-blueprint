@@ -20,14 +20,16 @@ import (
 type TodoService struct {
 	todoRepo    domain.TodoRepository
 	sessionRepo domain.SessionRepository
+	sessionName string
 	store       sessions.Store
 }
 
 // NewTodoService creates a new TodoService with the given repositories.
-func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRepository, store sessions.Store) *TodoService {
+func NewTodoService(todoRepo domain.TodoRepository, sessionRepo domain.SessionRepository, store sessions.Store, sessionName string) *TodoService {
 	return &TodoService{
 		todoRepo:    todoRepo,
 		sessionRepo: sessionRepo,
+		sessionName: sessionName,
 		store:       store,
 	}
 }
@@ -216,7 +218,7 @@ func (s *TodoService) resetMVC(mvc *TodoMVC) {
 }
 
 func (s *TodoService) upsertSessionID(r *http.Request, w http.ResponseWriter) (string, error) {
-	sess, err := s.store.Get(r, "connections")
+	sess, err := s.store.Get(r, s.sessionName)
 	if err != nil {
 		return "", fmt.Errorf("failed to get session: %w", err)
 	}

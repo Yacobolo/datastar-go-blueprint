@@ -52,7 +52,7 @@
    task dev            # Starts Air, esbuild, and Tailwind via Hivemind
    ```
 
-   Visit [`http://localhost:8080`](https://www.google.com/search?q=http://localhost:8080).
+   Visit the URL printed by `task dev`. Each worktree gets its own app port, NATS port, SQLite DB, and session cookie name.
 
 ---
 
@@ -95,7 +95,7 @@
 
 | **Command**         | **Description**                             |
 | ------------------- | ------------------------------------------- |
-| `task dev`          | Start full hot-reload dev environment       |
+| `task dev`          | Start hot-reload dev env with worktree-specific ports/state |
 | `task generate:all` | Run all code generators (SQL)               |
 | `task build`        | Create a production-ready compressed binary |
 | `task check`        | Run tests and linters                       |
