@@ -1,15 +1,13 @@
 package components
 
 import (
-	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
-
 	g "maragu.dev/gomponents"
 	h "maragu.dev/gomponents/html"
 )
 
 func icon(children ...g.Node) g.Node {
 	nodes := g.Group{
-		h.Class(ui.Icon),
+		h.Class("h-5 w-5 shrink-0"),
 		g.Attr("viewBox", "0 0 24 24"),
 		g.Attr("fill", "none"),
 		g.Attr("stroke", "currentColor"),

@@ -4,6 +4,7 @@
  */
 
 export type ThemeMode = 'system' | 'light' | 'dark'
+export type ResolvedTheme = 'light' | 'dark'
 
 const STORAGE_KEY = 'theme'
 const THEME_ATTR = 'data-theme'
@@ -14,16 +15,32 @@ const CYCLE_ORDER: ThemeMode[] = ['system', 'light', 'dark']
 /**
  * Get the resolved theme based on system preference
  */
-function getSystemTheme(): 'light' | 'dark' {
+function getSystemTheme(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function resolveTheme(mode: ThemeMode): ResolvedTheme {
+  return mode === 'system' ? getSystemTheme() : mode
+}
+
+function emitThemeChange(mode: ThemeMode): void {
+  window.dispatchEvent(
+    new CustomEvent('themechange', {
+      detail: {
+        mode,
+        resolved: resolveTheme(mode),
+      },
+    })
+  )
 }
 
 /**
  * Apply the resolved theme to the document
  */
 function applyTheme(mode: ThemeMode): void {
-  const resolved = mode === 'system' ? getSystemTheme() : mode
+  const resolved = resolveTheme(mode)
   document.documentElement.setAttribute(THEME_ATTR, resolved)
+  emitThemeChange(mode)
 }
 
 /**
@@ -35,6 +52,10 @@ export function getTheme(): ThemeMode {
     return stored
   }
   return 'system'
+}
+
+export function getResolvedTheme(): ResolvedTheme {
+  return resolveTheme(getTheme())
 }
 
 /**
@@ -80,6 +101,7 @@ export function initTheme(): void {
  */
 export const themeToggle = {
   get: getTheme,
+  resolved: getResolvedTheme,
   set: setTheme,
   cycle: cycleTheme,
   init: initTheme,

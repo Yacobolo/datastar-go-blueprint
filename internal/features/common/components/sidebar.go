@@ -1,8 +1,6 @@
 package components
 
 import (
-	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
-
 	g "maragu.dev/gomponents"
 	data "maragu.dev/gomponents-datastar"
 	h "maragu.dev/gomponents/html"
@@ -10,48 +8,68 @@ import (
 
 // Sidebar renders a simple collapsible navigation sidebar.
 func Sidebar() g.Node {
-	return h.Aside(
-		h.Class(ui.AppSidebar),
-		h.Data("class", "{'app-sidebar--collapsed': $sidebarCollapsed}"),
-		h.Div(
-			h.Class(ui.SidebarHeader),
-			h.A(
-				h.Href("/"),
-				h.Class(ui.SidebarLogo),
-				h.Span(h.Class(ui.SidebarLogoIcon), g.Text("DS")),
-				h.Span(h.Class(ui.SidebarLogoText), g.Text("Datastar")),
-			),
+	return h.Div(
+		h.Class("drawer-side z-30"),
+		h.Label(
+			h.For("app-drawer"),
+			h.Class("drawer-overlay"),
+			data.On("click", "$sidebarOpen = false"),
 		),
-		h.Nav(
-			h.Class(ui.SidebarNav),
+		h.Aside(
+			h.Class("flex min-h-full w-72 flex-col overflow-x-hidden border-r border-base-300 bg-base-100 transition-[width] duration-200"),
+			h.Data("class", "{'lg:w-20': $sidebarCollapsed, 'lg:w-72': !$sidebarCollapsed}"),
 			h.Div(
-				h.Class(ui.NavSection),
+				h.Class("flex items-center gap-3 border-b border-base-300 px-4 py-4"),
 				h.A(
 					h.Href("/"),
-					h.Class(classNames(ui.NavItem, ui.NavItemActive)),
-					h.Span(h.Class(ui.NavItemIcon), IconHome()),
-					h.Span(h.Class(ui.NavItemLabel), g.Text("Todos")),
+					h.Class("btn btn-ghost justify-start px-2 text-lg normal-case"),
+					h.Span(h.Class("text-primary"), g.Text("DS")),
+					h.Span(
+						h.Class("truncate"),
+						h.Data("class", "{'lg:hidden': $sidebarCollapsed}"),
+						g.Text("Datastar"),
+					),
 				),
 			),
-		),
-		h.Div(
-			h.Class(ui.SidebarFooter),
-			h.Button(
-				h.Class(ui.SidebarToggle),
-				data.On("click", "$sidebarCollapsed = !$sidebarCollapsed"),
-				g.Attr("aria-label", "Toggle sidebar"),
-				h.Type("button"),
-				h.Span(
-					h.Class(ui.NavItemIcon),
-					data.Show("!$sidebarCollapsed"),
-					IconChevronLeft(),
+			h.Ul(
+				h.Class("menu flex-1 gap-1 p-4"),
+				h.Li(
+					h.A(
+						h.Href("/"),
+						h.Class("menu-active"),
+						h.Data("class", "{'lg:justify-center': $sidebarCollapsed}"),
+						IconHome(),
+						h.Span(
+							h.Class("truncate"),
+							h.Data("class", "{'lg:hidden': $sidebarCollapsed}"),
+							g.Text("Todos"),
+						),
+					),
 				),
-				h.Span(
-					h.Class(ui.NavItemIcon),
-					data.Show("$sidebarCollapsed"),
-					IconChevronRight(),
+			),
+			h.Div(
+				h.Class("border-t border-base-300 p-4"),
+				h.Button(
+					h.Class("btn btn-ghost w-full justify-start"),
+					h.Data("class", "{'lg:justify-center': $sidebarCollapsed}"),
+					data.Attr("title", "$sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"),
+					data.On("click", "$sidebarCollapsed = !$sidebarCollapsed"),
+					g.Attr("aria-label", "Toggle sidebar"),
+					h.Type("button"),
+					h.Span(
+						data.Show("!$sidebarCollapsed"),
+						IconChevronLeft(),
+					),
+					h.Span(
+						data.Show("$sidebarCollapsed"),
+						IconChevronRight(),
+					),
+					h.Span(
+						h.Class("truncate"),
+						h.Data("class", "{'lg:hidden': $sidebarCollapsed}"),
+						g.Text("Collapse"),
+					),
 				),
-				h.Span(h.Class(ui.SidebarToggleText), g.Text("Collapse")),
 			),
 		),
 	)
@@ -59,38 +77,5 @@ func Sidebar() g.Node {
 
 // MobileSidebar renders the mobile overlay sidebar.
 func MobileSidebar() g.Node {
-	return g.Group{
-		h.Div(
-			h.Class(ui.SidebarOverlay),
-			data.Show("$sidebarOpen"),
-			data.On("click", "$sidebarOpen = false"),
-		),
-		h.Aside(
-			h.Class(classNames(ui.AppSidebar, ui.AppSidebarMobile)),
-			h.Data("class", "{'app-sidebar--open': $sidebarOpen}"),
-			h.Div(
-				h.Class(ui.SidebarHeader),
-				h.A(
-					h.Href("/"),
-					h.Class(ui.SidebarLogo),
-					data.On("click", "$sidebarOpen = false"),
-					h.Span(h.Class(ui.SidebarLogoIcon), g.Text("DS")),
-					h.Span(h.Class(ui.SidebarLogoText), g.Text("Datastar")),
-				),
-			),
-			h.Nav(
-				h.Class(ui.SidebarNav),
-				h.Div(
-					h.Class(ui.NavSection),
-					h.A(
-						h.Href("/"),
-						h.Class(classNames(ui.NavItem, ui.NavItemActive)),
-						data.On("click", "$sidebarOpen = false"),
-						h.Span(h.Class(ui.NavItemIcon), IconHome()),
-						h.Span(h.Class(ui.NavItemLabel), g.Text("Todos")),
-					),
-				),
-			),
-		),
-	}
+	return nil
 }

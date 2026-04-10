@@ -4,7 +4,6 @@ package pages
 import (
 	"github.com/yacobolo/datastar-go-blueprint/internal/features/common/layouts"
 	appds "github.com/yacobolo/datastar-go-blueprint/internal/platform/ds"
-	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
 
 	g "maragu.dev/gomponents"
 	data "maragu.dev/gomponents-datastar"
@@ -16,18 +15,18 @@ func IndexPage(title string) g.Node {
 	return layouts.Base(
 		title,
 		h.Div(
-			h.Class(ui.Page),
+			h.Class("w-full"),
 			h.Div(
 				h.ID("todos-container"),
 				data.Init(appds.Get("/api/todos/updates", appds.Opt("requestCancellation", "disabled"))),
 				h.Div(
-					h.Class(ui.TodoLoading),
-					h.P(g.Text("Loading todos...")),
+					h.Class("flex min-h-[16rem] items-center justify-center"),
+					h.Span(h.Class("loading loading-spinner loading-lg text-primary")),
 				),
 			),
 			h.Div(
 				h.ID("toast-container"),
-				h.Class(ui.ToastContainer),
+				h.Class("toast toast-top toast-end z-50"),
 			),
 		),
 	)

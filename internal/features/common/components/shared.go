@@ -1,10 +1,9 @@
+// Package components provides reusable UI building blocks for the app shell and shared views.
 package components
 
 import (
 	"fmt"
 	"strings"
-
-	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
 
 	g "maragu.dev/gomponents"
 	h "maragu.dev/gomponents/html"
@@ -52,8 +51,10 @@ func Icon(icon string, attrs ...string) g.Node {
 
 // SseIndicator renders a shared loading indicator bound to a Datastar signal.
 func SseIndicator(signalName string) g.Node {
-	return h.Div(
-		h.Class(ui.TextPrimary),
-		h.Data("class", fmt.Sprintf("{'%s': $%s}", classNames(ui.Loading, ui.LoadingDots, ui.MlMd), signalName)),
+	return h.Span(
+		h.Data(
+			"class",
+			fmt.Sprintf("{'loading loading-dots loading-xs text-base-content/60': $%s, 'hidden': !$%s}", signalName, signalName),
+		),
 	)
 }

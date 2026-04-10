@@ -3,8 +3,6 @@ package components
 import (
 	"time"
 
-	"github.com/yacobolo/datastar-go-blueprint/internal/ui"
-
 	g "maragu.dev/gomponents"
 	data "maragu.dev/gomponents-datastar"
 	h "maragu.dev/gomponents/html"
@@ -24,26 +22,28 @@ const (
 	ToastWarning ToastType = "warning"
 )
 
-// toastTypeClass returns the type-safe CSS constant for the toast type.
 func toastTypeClass(t ToastType) string {
 	switch t {
 	case ToastSuccess:
-		return ui.ToastSuccess
+		return "alert-success"
 	case ToastError:
-		return ui.ToastError
+		return "alert-error"
 	case ToastInfo:
-		return ui.ToastInfo
+		return "alert-info"
+	case ToastWarning:
+		return "alert-warning"
 	default:
-		return ui.ToastInfo
+		return "alert-info"
 	}
 }
 
 // Toast renders a transient toast message.
 func Toast(message string, toastType ToastType) g.Node {
 	return h.Div(
-		h.Class(classNames(ui.Toast, toastTypeClass(toastType))),
+		h.Class(classNames("alert shadow-lg transition-opacity duration-300", toastTypeClass(toastType))),
+		g.Attr("role", "alert"),
 		data.Init(
-			"el.style.opacity = '0'; setTimeout(() => el.remove(), 300)",
+			"el.classList.add('opacity-0'); setTimeout(() => el.remove(), 300)",
 			data.ModifierDelay,
 			data.Duration(3*time.Second),
 		),

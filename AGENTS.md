@@ -26,10 +26,7 @@ go test ./internal/features/todo
 # Run Go linters (golangci-lint)
 task lint
 
-# Run CSS linting (checks for unused/invalid CSS classes)
-task css:lint
-
-# Run all checks (tests + lint + css lint)
+# Run all checks (tests + lint + asset builds)
 task check
 ```
 
@@ -38,16 +35,15 @@ task check
 # Full production build (with code generation + asset bundling)
 task build
 
-# Development mode (hot reload with Air and esbuild)
+# Development mode (hot reload with Air, esbuild, and Tailwind)
 task dev
 
 # Stop development processes
 task dev:stop
 
 # Code generation only
-task generate:all       # All generators (sqlc, cssgen)
+task generate:all       # All generators (sqlc)
 task generate:sqlc      # Generate type-safe DB queries
-task generate:css       # Generate type-safe CSS constants
 ```
 
 ### Asset Bundling
@@ -335,10 +331,10 @@ func (h *Handlers) ToggleTodo(w http.ResponseWriter, r *http.Request) {
 
 ### Gomponents Component Patterns
 
-**Type-safe CSS classes from generated constants:**
+**Tailwind/DaisyUI classes are written inline in views:**
 ```go
 Button(
-    Class(ui.Btn + " " + ui.BtnLg + " " + ui.BtnPrimary),
+    Class("btn btn-primary btn-lg"),
     Text("Save"),
 )
 ```
@@ -394,10 +390,10 @@ layouts.Base("My Page", Div(Text("Content here")))
 - Generate with `task generate:sqlc` or `sqlc generate`
 - Creates type-safe Go code in `internal/store/queries/`
 
-**CSS files** (`web/ui/styles/**/*.css`):
-- Generate with `task generate:css`
-- Creates type-safe constants in `internal/ui/styles*.gen.go`
-- Use constants in gomponents: `Class(ui.Btn)`
+**Tailwind CSS entry file** (`web/ui/styles/main.css`):
+- Keep this file minimal: Tailwind import, `@source`, and DaisyUI plugin config only
+- Build CSS with `task build:web:css`
+- Prefer DaisyUI defaults and Tailwind utility classes directly in gomponents/Lit markup
 
 **Migrations** (`internal/store/migrations/*.sql`):
 - Name format: `NNN_description.sql`
