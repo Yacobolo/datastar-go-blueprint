@@ -1,5 +1,5 @@
-// Package components provides reusable UI building blocks for the app shell and shared views.
-package components
+// Package core provides reusable UI building blocks for the app shell and shared views.
+package core
 
 import (
 	"fmt"

@@ -65,12 +65,15 @@
 ├── internal/
 │   ├── app/             # Application lifecycle & initialization
 │   ├── domain/          # Core business logic and entities
-│   ├── features/        # Feature-based modules (Gomponents, Handlers, Routes)
 │   ├── platform/        # Shared infra (Router, PubSub)
+│   ├── services/        # Business logic services and UI state models
 │   └── store/           # Database layer (Migrations, SQLC, Repositories)
 ├── web/
 │   ├── resources/       # Static assets & embedded Go files
 │   └── ui/              # Frontend source (Lit components, Tailwind entry, TS)
+├── internal/ui/
+│   ├── core/            # Shared layouts and reusable UI components
+│   └── todo/            # Todo page, components, handlers, and routes
 ├── Procfile.dev         # Dev process management (Hivemind)
 ├── Taskfile.yml         # Project automation tasks
 └── sqlc.yaml            # SQL compiler configuration
@@ -80,7 +83,7 @@
 
 ## Key Features
 
-- **Feature-Based Architecture:** Logic grouped by domain, not layer.
+- **Flat UI + Services Architecture:** Shared UI lives in `internal/ui/core`, feature UI in `internal/ui/<feature>`, and business logic in `internal/services`.
 - **Type-Safe Everything:** \* [sqlc](https://sqlc.dev/) for database queries.
   - [gomponents-datastar](https://github.com/maragudk/gomponents-datastar) for Datastar attributes.
 - **Tailwind + DaisyUI:** Styling stays close to framework defaults with no handwritten app CSS.

@@ -7,12 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
-	commoncomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/common/components"
-	todocomponents "github.com/yacobolo/datastar-go-blueprint/internal/features/todo/components"
-	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/pages"
-	"github.com/yacobolo/datastar-go-blueprint/internal/features/todo/services"
 	"github.com/yacobolo/datastar-go-blueprint/internal/platform/pubsub"
 	"github.com/yacobolo/datastar-go-blueprint/internal/platform/render"
+	"github.com/yacobolo/datastar-go-blueprint/internal/services"
+	"github.com/yacobolo/datastar-go-blueprint/internal/ui/core"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -83,7 +81,7 @@ func subject(sessionID string) string {
 
 // IndexPage renders the initial page
 func (h *Handlers) IndexPage(w http.ResponseWriter, _ *http.Request) {
-	if err := render.HTML(w, pages.IndexPage("Datastar Go Blueprint")); err != nil {
+	if err := render.HTML(w, IndexPage("Datastar Go Blueprint")); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
@@ -135,7 +133,7 @@ func (h *Handlers) TodosUpdates(w http.ResponseWriter, r *http.Request) {
 
 			// Send toast if present
 			if updateMsg.Toast != nil {
-				toastComponent := commoncomponents.Toast(updateMsg.Toast.Message, updateMsg.Toast.Type)
+				toastComponent := core.Toast(updateMsg.Toast.Message, updateMsg.Toast.Type)
 				if err := render.PatchSSE(
 					sse,
 					toastComponent,
@@ -157,7 +155,7 @@ func (h *Handlers) refreshTodos(ctx context.Context, sse *datastar.ServerSentEve
 		return err
 	}
 
-	return render.PatchSSE(sse, todocomponents.TodosMVCView(mvc))
+	return render.PatchSSE(sse, TodosMVCView(mvc))
 }
 
 // notifyUpdate publishes a NATS message to trigger UI refresh
@@ -189,7 +187,7 @@ func (h *Handlers) ResetTodos(w http.ResponseWriter, r *http.Request) {
 	// Notify via NATS (triggers SSE push)
 	h.notifyUpdate(sessionID,
 		pubsub.WithRefresh(),
-		pubsub.WithToast("Todos reset", commoncomponents.ToastSuccess))
+		pubsub.WithToast("Todos reset", core.ToastSuccess))
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -231,8 +229,8 @@ func (h *Handlers) SetMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mode := todocomponents.TodoViewMode(modeRaw)
-	if mode < todocomponents.TodoViewModeAll || mode > todocomponents.TodoViewModeCompleted {
+	mode := ViewMode(modeRaw)
+	if mode < ViewModeAll || mode > ViewModeCompleted {
 		http.Error(w, "invalid mode", http.StatusBadRequest)
 		return
 	}
@@ -354,7 +352,7 @@ func (h *Handlers) SaveEdit(w http.ResponseWriter, r *http.Request) {
 	}
 	h.notifyUpdate(sessionID,
 		pubsub.WithRefresh(),
-		pubsub.WithToast(toastMsg, commoncomponents.ToastSuccess))
+		pubsub.WithToast(toastMsg, core.ToastSuccess))
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -385,7 +383,7 @@ func (h *Handlers) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 
 	h.notifyUpdate(sessionID,
 		pubsub.WithRefresh(),
-		pubsub.WithToast("Todo deleted", commoncomponents.ToastSuccess))
+		pubsub.WithToast("Todo deleted", core.ToastSuccess))
 
 	w.WriteHeader(http.StatusOK)
 }

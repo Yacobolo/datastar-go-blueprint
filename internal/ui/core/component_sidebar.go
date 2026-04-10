@@ -1,4 +1,4 @@
-package components
+package core
 
 import (
 	g "maragu.dev/gomponents"
