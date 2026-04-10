@@ -114,7 +114,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 				h.Title(fmt.Sprintf("Clear %d completed todos", completed)),
 				g.Attr("aria-label", fmt.Sprintf("Clear %d completed todos", completed)),
 				data.On("click", appds.Delete("/api/todos/-1")),
-				commoncomponents.Icon("material-symbols:delete", "class", "h-5 w-5"),
+				commoncomponents.IconTrash(),
 			),
 		)
 	}
@@ -124,7 +124,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 			h.Class("btn btn-outline btn-sm"),
 			h.Title("Reset list"),
 			data.On("click", appds.Put("/api/todos/reset")),
-			commoncomponents.Icon("material-symbols:delete-sweep", "class", "h-5 w-5"),
+			commoncomponents.IconReset(),
 			h.Span(g.Text("Reset")),
 		),
 	)
@@ -155,7 +155,7 @@ func TodosMVCView(mvc *TodoMVC) g.Node {
 							data.On("click", appds.Post("/api/todos/-1/toggle")),
 							data.Indicator("toggleAllFetching"),
 							data.Attr("disabled", "$toggleAllFetching"),
-							commoncomponents.Icon("material-symbols:checklist", "class", "h-5 w-5"),
+							commoncomponents.IconToggleAll(),
 						)),
 						g.If(mvc.EditingIdx < 0, TodoInput(-1)),
 						commoncomponents.SseIndicator("toggleAllFetching"),
@@ -224,11 +224,6 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 		return nil
 	}
 
-	iconName := "material-symbols:check-box-outline-blank"
-	if todo.Completed {
-		iconName = "material-symbols:check-box-outline"
-	}
-
 	return h.Li(
 		h.Class(classNames(
 			"flex items-center gap-3 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-sm",
@@ -250,7 +245,7 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 				),
 			),
 			data.Indicator(fetchingSignalName),
-			commoncomponents.Icon(iconName, "class", "h-5 w-5"),
+			commoncomponents.IconCheckbox(todo.Completed),
 		),
 		h.Button(
 			h.ID(indicatorID),
@@ -282,7 +277,7 @@ func TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) g.Node {
 			data.Indicator(fetchingSignalName),
 			data.Attr("disabled", fmt.Sprintf("$%s", fetchingSignalName)),
 			g.Attr("data-testid", fmt.Sprintf("delete_todo%d", i)),
-			commoncomponents.Icon("material-symbols:close", "class", "h-5 w-5"),
+			commoncomponents.IconClose(),
 		),
 	)
 }

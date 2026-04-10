@@ -79,7 +79,6 @@ func Base(title string, children ...g.Node) g.Node {
 					document.documentElement.dataset.theme = resolved;
 				})();
 			`)),
-				h.Script(h.Src("https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js")),
 				h.Link(h.Href(resources.StaticPath("styles.css")), h.Rel("stylesheet"), h.Type("text/css")),
 				h.Script(h.Type("module"), h.Src(resources.StaticPath("theme-switcher.js"))),
 				h.Script(h.Type("module"), h.Src("https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js")),

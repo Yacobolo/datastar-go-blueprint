@@ -39,16 +39,6 @@ func KVPairsAttrs(kvPairs ...string) g.Group {
 	return attrs
 }
 
-// Icon renders an iconify icon.
-func Icon(icon string, attrs ...string) g.Node {
-	nodes := g.Group{
-		g.Attr("icon", icon),
-		g.Attr("noobserver"),
-	}
-	nodes = append(nodes, KVPairsAttrs(attrs...)...)
-	return g.El("iconify-icon", nodes...)
-}
-
 // SseIndicator renders a shared loading indicator bound to a Datastar signal.
 func SseIndicator(signalName string) g.Node {
 	return h.Span(
